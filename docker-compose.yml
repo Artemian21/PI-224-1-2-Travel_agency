@@ -1,0 +1,32 @@
+version: '3.4'
+
+services:
+  mssql-server:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: mssql-server
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=My21252006AA!
+    ports:
+      - "1433:1433"
+    networks:
+      - app-network
+
+  travel-agency-pl:
+    build:
+      context: .
+      dockerfile: Travel_agency.PL/Dockerfile
+    container_name: travel-agency-pl
+    ports:
+      - "8080:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=mssql-server;Database=TravelAgencyDB;User=sa;Password=My21252006AA!
+    depends_on:
+      - mssql-server
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
