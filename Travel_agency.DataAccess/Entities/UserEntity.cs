@@ -15,5 +15,9 @@ namespace Travel_agency.DataAccess.Entities
         public string Email { get; set; }
         public byte[] PasswordHash { get; set; }
         public UserRole Role { get; set; }
+
+        public ICollection<HotelBookingEntity> HotelBookings { get; set; } = new List<HotelBookingEntity>();
+        public ICollection<TicketBookingEntity> TicketBookings { get; set; } = new List<TicketBookingEntity>();
+        public ICollection<TourBookingEntity> TourBookings { get; set; } = new List<TourBookingEntity>();
     }
 }
