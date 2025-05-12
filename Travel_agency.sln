@@ -6,6 +6,9 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Travel_agency.BLL", "Travel_agency.BLL\Travel_agency.BLL.csproj", "{753BC309-218D-4628-8194-D78E6ED411AF}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Travel_agency.DataAccess", "Travel_agency.DataAccess\Travel_agency.DataAccess.csproj", "{893AAB41-9989-42CD-A672-A0A6F04F7883}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D9D8BD53-1876-4D6B-A8F1-F5153CD4ECCE} = {D9D8BD53-1876-4D6B-A8F1-F5153CD4ECCE}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Travel_agency.Core", "Travel_agency.Core\Travel_agency.Core.csproj", "{D9D8BD53-1876-4D6B-A8F1-F5153CD4ECCE}"
 EndProject
@@ -16,7 +19,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Элементы решен
 		docker-compose.yml = docker-compose.yml
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Travel_agency.PL", "Travel_agency.PL\Travel_agency.PL.csproj", "{B22601BC-D226-4402-8B5D-F4CA0472EF43}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Travel_agency.PL", "Travel_agency.PL\Travel_agency.PL.csproj", "{B22601BC-D226-4402-8B5D-F4CA0472EF43}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
