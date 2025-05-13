@@ -8,11 +8,11 @@ namespace Travel_agency.Core.Enums
 {
     public enum Status
     {
-        Pending,
-        Confirmed,
-        Cancelled,
-        Rejected,
-        Paid,
-        Completed
+        Pending,    // Очікує підтвердження
+        Confirmed,  // Підтверджено
+        Cancelled,  // Скасовано користувачем
+        Rejected,   // Відхилено оператором
+        Paid,       // Оплачено
+        Completed   // Завершено
     }
 }
