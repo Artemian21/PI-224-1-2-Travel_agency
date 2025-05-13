@@ -20,6 +20,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Элементы решен
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Travel_agency.PL", "Travel_agency.PL\Travel_agency.PL.csproj", "{B22601BC-D226-4402-8B5D-F4CA0472EF43}"
+	ProjectSection(ProjectDependencies) = postProject
+		{893AAB41-9989-42CD-A672-A0A6F04F7883} = {893AAB41-9989-42CD-A672-A0A6F04F7883}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
