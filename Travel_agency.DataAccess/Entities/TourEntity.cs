@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Travel_agency.Core.Enums;
 
 namespace Travel_agency.DataAccess.Entities
 {
@@ -10,13 +11,13 @@ namespace Travel_agency.DataAccess.Entities
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
-        public string Type { get; set; }
+        public TypeTour Type { get; set; }
         public string Country { get; set; }
         public string Region { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public decimal Price { get; set; }
-        public string ImageUrl { get; set; }
+        public string? ImageUrl { get; set; }
 
         public ICollection<TourBookingEntity> TourBookings { get; set; } = new List<TourBookingEntity>();
 
