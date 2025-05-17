@@ -32,6 +32,11 @@ namespace Travel_agency.DataAccess.Repository
             return await _context.Users.AsNoTracking().ToListAsync();
         }
 
+        public async Task<UserEntity?> GetUserByEmailAsync(string email)
+        {
+            return await _context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Email == email);
+        }
+
         public async Task<UserEntity> AddUserAsync(UserEntity user)
         {
             _context.Users.Add(user);
