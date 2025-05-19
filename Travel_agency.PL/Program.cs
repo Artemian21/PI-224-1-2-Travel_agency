@@ -3,7 +3,7 @@ using Travel_agency.DataAccess;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<TravelAgencyDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("MSSQLConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -11,6 +11,12 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<TravelAgencyDbContext>();
+    db.Database.Migrate();
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

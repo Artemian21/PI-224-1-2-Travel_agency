@@ -26,7 +26,7 @@ WORKDIR /app
 COPY --from=publish /app/publish . 
 
 # Встановлюємо змінні середовища для підключення до бази даних
-ENV ConnectionStrings__DefaultConnection "Server=mssql-server;Database=TravelAgencyDB;User=sa;Password=My21252006AA!"
+ENV ConnectionStrings__DefaultConnection "Server=mssql-server;Database=TravelAgencyDB;User=sa;Password=My21252006AA!;TrustServerCertificate=True"
 
 # Запуск вашого застосунку
 ENTRYPOINT ["dotnet", "Travel_agency.PL.dll"]
