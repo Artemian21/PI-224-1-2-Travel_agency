@@ -68,5 +68,10 @@ namespace Travel_agency.DataAccess.Repository
                 await _context.SaveChangesAsync();
             }
         }
+        
+        public IQueryable<TourEntity> AsQueryable()
+        {
+            return _context.Tours.AsNoTracking();
+        }
     }
 }
