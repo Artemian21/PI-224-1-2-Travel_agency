@@ -24,6 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Travel_agency.BLL\Travel_agency.BLL.csproj" />
     <ProjectReference Include="..\Travel_agency.DataAccess\Travel_agency.DataAccess.csproj" />
   </ItemGroup>
 
