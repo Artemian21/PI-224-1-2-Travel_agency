@@ -17,14 +17,14 @@ namespace Travel_agency.DataAccess;
 
         public UnitOfWork(
             TravelAgencyDbContext context,
-            HotelBookingRepository hotelBookingRepository,
-            HotelRepository hotelRepository,
-            HotelRoomRepository hotelRoomRepository,
-            TicketBookingRepository ticketBookingRepository,
-            TourBookingRepository tourBookingRepository,
-            TourRepository tourRepository,
-            TransportRepository transportRepository,
-            UserRepository userRepository)
+            IHotelBookingRepository hotelBookingRepository,
+            IHotelRepository hotelRepository,
+            IHotelRoomRepository hotelRoomRepository,
+            ITicketBookingRepository ticketBookingRepository,
+            ITourBookingRepository tourBookingRepository,
+            ITourRepository tourRepository,
+            ITransportRepository transportRepository,
+            IUserRepository userRepository)
         {
             _context = context;
 

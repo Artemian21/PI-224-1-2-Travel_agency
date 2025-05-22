@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Travel_agency.BLL.Abstractions;
 using Travel_agency.Core.Exceptions;
-using Travel_agency.Core.Models;
+using Travel_agency.Core.Models.Transports;
 using Travel_agency.DataAccess.Abstraction;
 using Travel_agency.DataAccess.Entities;
 
@@ -30,13 +30,13 @@ namespace Travel_agency.BLL.Services
             return _mapper.Map<IEnumerable<TransportDto>>(transportEntities);
         }
 
-        public async Task<TransportDto> GetTransportByIdAsync(Guid transportId)
+        public async Task<TransportWithBookingsDto> GetTransportByIdAsync(Guid transportId)
         {
             var transportEntity = await _unitOfWork.Transports.GetTransportByIdAsync(transportId);
             if (transportEntity == null)
                 throw new NotFoundException($"Transport with ID {transportId} not found.");
 
-            return _mapper.Map<TransportDto>(transportEntity);
+            return _mapper.Map<TransportWithBookingsDto>(transportEntity);
         }
 
         public async Task<TransportDto> AddTransportAsync(TransportDto transportDto)

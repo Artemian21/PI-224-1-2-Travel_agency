@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Travel_agency.BLL.Abstractions;
 using Travel_agency.Core.Enums;
 using Travel_agency.Core.Exceptions;
-using Travel_agency.Core.Models;
+using Travel_agency.Core.Models.Hotels;
 using Travel_agency.DataAccess.Abstraction;
 using Travel_agency.DataAccess.Entities;
 
@@ -30,7 +30,7 @@ namespace Travel_agency.BLL.Services
             return _mapper.Map<IEnumerable<HotelBookingDto>>(hotelBookingsEntities);
         }
 
-        public async Task<HotelBookingDto> GetHotelBookingByIdAsync(Guid hotelBookingId)
+        public async Task<HotelBookingDetailsDto> GetHotelBookingByIdAsync(Guid hotelBookingId)
         {
             var hotelBookingEntity = await _unitOfWork.HotelBookings.GetHotelBookingByIdAsync(hotelBookingId);
             if (hotelBookingEntity == null)
@@ -38,7 +38,7 @@ namespace Travel_agency.BLL.Services
                 throw new NotFoundException($"Hotel booking with ID {hotelBookingId} not found.");
             }
 
-            return _mapper.Map<HotelBookingDto>(hotelBookingEntity);
+            return _mapper.Map<HotelBookingDetailsDto>(hotelBookingEntity);
         }
 
         public async Task<HotelBookingDto> AddHotelBookingAsync(HotelBookingDto hotelBookingDto)

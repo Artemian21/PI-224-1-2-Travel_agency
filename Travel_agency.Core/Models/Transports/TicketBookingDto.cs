@@ -1,6 +1,6 @@
 ﻿using Travel_agency.Core.Enums;
 
-namespace Travel_agency.Core.Models;
+namespace Travel_agency.Core.Models.Transports;
 
 public class TicketBookingDto
 {

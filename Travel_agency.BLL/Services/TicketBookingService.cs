@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Travel_agency.BLL.Abstractions;
 using Travel_agency.Core.Enums;
 using Travel_agency.Core.Exceptions;
-using Travel_agency.Core.Models;
+using Travel_agency.Core.Models.Transports;
 using Travel_agency.DataAccess.Abstraction;
 using Travel_agency.DataAccess.Entities;
 
@@ -31,13 +31,13 @@ namespace Travel_agency.BLL.Services
             return _mapper.Map<IEnumerable<TicketBookingDto>>(ticketBookingEntities);
         }
 
-        public async Task<TicketBookingDto?> GetTicketBookingByIdAsync(Guid ticketBookingId)
+        public async Task<TicketBookingDetailsDto?> GetTicketBookingByIdAsync(Guid ticketBookingId)
         {
             var ticketBookingEntity = await _unitOfWork.TicketBookings.GetTicketBookingByIdAsync(ticketBookingId);
             if (ticketBookingEntity == null)
                 throw new NotFoundException($"Ticket Booking with ID {ticketBookingId} not found.");
 
-            return _mapper.Map<TicketBookingDto>(ticketBookingEntity);
+            return _mapper.Map<TicketBookingDetailsDto>(ticketBookingEntity);
         }
 
         public async Task<TicketBookingDto> AddTicketBookingAsync(TicketBookingDto ticketBookingDto)

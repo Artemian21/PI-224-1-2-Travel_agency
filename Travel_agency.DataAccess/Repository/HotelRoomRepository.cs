@@ -31,6 +31,13 @@ namespace Travel_agency.DataAccess.Repository
                                             .FirstOrDefaultAsync(h => h.Id == hotelRoomId);
         }
 
+        public async Task<IEnumerable<HotelRoomEntity>> GetRoomsByHotelIdAsync(Guid hotelId)
+        {
+            return await _context.HotelRooms.AsNoTracking()
+                .Where(r => r.HotelId == hotelId)
+                .ToListAsync();
+        }
+
         public async Task<HotelRoomEntity> AddHotelRoomAsync(HotelRoomEntity hotelRoom)
         {
             await _context.HotelRooms.AddAsync(hotelRoom);

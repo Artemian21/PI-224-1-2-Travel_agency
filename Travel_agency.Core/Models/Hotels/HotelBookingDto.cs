@@ -1,6 +1,6 @@
 ﻿using Travel_agency.Core.Enums;
 
-namespace Travel_agency.Core.Models;
+namespace Travel_agency.Core.Models.Hotels;
 
 public class HotelBookingDto
 {
@@ -11,6 +11,4 @@ public class HotelBookingDto
     public DateTime EndDate { get; set; }
     public int NumberOfGuests { get; set; }
     public Status Status { get; set; } = Status.Pending;
-    public HotelRoomDto HotelRoom { get; set; }
-    public UserDto User { get; set; }
 }
