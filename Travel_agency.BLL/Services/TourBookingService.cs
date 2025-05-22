@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Travel_agency.BLL.Abstractions;
 using Travel_agency.Core.Enums;
 using Travel_agency.Core.Exceptions;
-using Travel_agency.Core.Models;
+using Travel_agency.Core.Models.Tours;
 using Travel_agency.DataAccess.Abstraction;
 using Travel_agency.DataAccess.Entities;
 
@@ -30,14 +30,14 @@ namespace Travel_agency.BLL.Services
             return _mapper.Map<IEnumerable<TourBookingDto>>(tourBookingEntities);
         }
 
-        public async Task<TourBookingDto?> GetTourBookingByIdAsync(Guid tourBookingId)
+        public async Task<TourBookingDetailsDto?> GetTourBookingByIdAsync(Guid tourBookingId)
         {
             var tourBookingEntity = await _unitOfWork.TourBookings.GetTourBookingByIdAsync(tourBookingId);
             if (tourBookingEntity == null)
                 throw new NotFoundException($"Tour booking with ID {tourBookingId} not found.");
 
 
-            return _mapper.Map<TourBookingDto>(tourBookingEntity);
+            return _mapper.Map<TourBookingDetailsDto>(tourBookingEntity);
         }
 
         public async Task<TourBookingDto> AddTourBookingAsync(TourBookingDto tourBookingDto)
@@ -86,12 +86,6 @@ namespace Travel_agency.BLL.Services
 
             if (!Enum.IsDefined(typeof(Status), dto.Status))
                 throw new BusinessValidationException("Invalid booking status.");
-
-            if (dto.Tour == null)
-                throw new BusinessValidationException("Associated tour is required.");
-
-            if (dto.User == null)
-                throw new BusinessValidationException("Associated user is required.");
         }
     }
 }

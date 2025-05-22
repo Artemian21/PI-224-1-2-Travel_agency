@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Travel_agency.BLL.Abstractions;
 using Travel_agency.Core.Enums;
 using Travel_agency.Core.Exceptions;
-using Travel_agency.Core.Models;
+using Travel_agency.Core.Models.Users;
 using Travel_agency.DataAccess.Abstraction;
 using Travel_agency.DataAccess.Entities;
 
@@ -24,7 +24,7 @@ namespace Travel_agency.BLL.Services
             this._mapper = mapper;
         }
 
-        public async Task<bool> AssignUserRoleAsync(Guid userId, string role)
+        public async Task<bool> AssignUserRoleAsync(Guid userId, UserRole role)
         {
             var userEntity = await _unitOfWork.Users.GetUserByIdAsync(userId);
             if (userEntity == null)
@@ -32,12 +32,7 @@ namespace Travel_agency.BLL.Services
                 throw new NotFoundException($"User with ID {userId} not found.");
             }
 
-            if (!Enum.TryParse<UserRole>(role, true, out var parsedRole))
-            {
-                throw new BusinessValidationException($"Invalid user role: {role}");
-            }
-
-            userEntity.Role = parsedRole;
+            userEntity.Role = role;
             await _unitOfWork.Users.UpdateUserAsync(userEntity);
             return true;
         }
@@ -60,7 +55,7 @@ namespace Travel_agency.BLL.Services
             return _mapper.Map<IEnumerable<UserDto>>(userEntities);
         }
 
-        public async Task<UserDto> GetUserByEmailAsync(string email)
+        public async Task<UserWithBookingsDto> GetUserByEmailAsync(string email)
         {
             if (string.IsNullOrWhiteSpace(email))
             {
@@ -73,10 +68,10 @@ namespace Travel_agency.BLL.Services
                 throw new NotFoundException($"User with email '{email}' not found.");
             }
 
-            return _mapper.Map<UserDto>(userEntity);
+            return _mapper.Map<UserWithBookingsDto>(userEntity);
         }
 
-        public async Task<UserDto> GetUserByIdAsync(Guid userId)
+        public async Task<UserWithBookingsDto> GetUserByIdAsync(Guid userId)
         {
             var userEntity = await _unitOfWork.Users.GetUserByIdAsync(userId);
             if (userEntity == null)
@@ -84,7 +79,7 @@ namespace Travel_agency.BLL.Services
                 throw new NotFoundException($"User with ID {userId} not found.");
             }
 
-            return _mapper.Map<UserDto>(userEntity);
+            return _mapper.Map<UserWithBookingsDto>(userEntity);
         }
 
         public async Task<UserDto> UpdateUserProfileAsync(UserDto updateDto)

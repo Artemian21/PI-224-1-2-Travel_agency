@@ -1,4 +1,4 @@
-﻿using Travel_agency.Core.Models;
+﻿using Travel_agency.Core.Models.Tours;
 
 namespace Travel_agency.BLL.Abstractions
 {
@@ -7,7 +7,8 @@ namespace Travel_agency.BLL.Abstractions
         Task<TourDto> AddTourAsync(TourDto tourDto);
         Task<bool> DeleteTourAsync(Guid tourId);
         Task<IEnumerable<TourDto>> GetAllToursAsync();
-        Task<TourDto> GetTourByIdAsync(Guid tourId);
+        Task<PagedResult<TourDto>> GetPagedToursAsync(int pageNumber, int pageSize);
+        Task<TourWithBookingsDto> GetTourByIdAsync(Guid tourId);
         Task<TourDto> UpdateTourAsync(TourDto tourDto);
     }
 }

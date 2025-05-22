@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Travel_agency.BLL.Abstractions;
 using Travel_agency.Core.Enums;
 using Travel_agency.Core.Exceptions;
-using Travel_agency.Core.Models;
+using Travel_agency.Core.Models.Tours;
 using Travel_agency.DataAccess.Abstraction;
 using Travel_agency.DataAccess.Entities;
 
@@ -31,13 +31,28 @@ namespace Travel_agency.BLL.Services
             return _mapper.Map<IEnumerable<TourDto>>(tourEntities);
         }
 
-        public async Task<TourDto> GetTourByIdAsync(Guid tourId)
+        public async Task<PagedResult<TourDto>> GetPagedToursAsync(int pageNumber, int pageSize)
+        {
+            var totalCount = await _unitOfWork.Tours.GetTotalToursCountAsync();
+            var tours = await _unitOfWork.Tours.GetToursPagedAsync(pageNumber, pageSize);
+            var mappedTours = _mapper.Map<IEnumerable<TourDto>>(tours);
+
+            return new PagedResult<TourDto>
+            {
+                Items = mappedTours,
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalCount = totalCount
+            };
+        }
+
+        public async Task<TourWithBookingsDto> GetTourByIdAsync(Guid tourId)
         {
             var tourEntity = await _unitOfWork.Tours.GetTourByIdAsync(tourId);
             if (tourEntity == null)
                 throw new NotFoundException($"Tour with ID {tourId} not found.");
 
-            return _mapper.Map<TourDto>(tourEntity);
+            return _mapper.Map<TourWithBookingsDto>(tourEntity);
         }
 
         public async Task<TourDto> AddTourAsync(TourDto tourDto)

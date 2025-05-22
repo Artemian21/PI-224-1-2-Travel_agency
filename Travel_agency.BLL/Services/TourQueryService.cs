@@ -2,7 +2,7 @@
 using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using Travel_agency.BLL.Abstractions;
-using Travel_agency.Core.Models;
+using Travel_agency.Core.Models.Tours;
 using Travel_agency.DataAccess.Abstraction;
 
 namespace Travel_agency.BLL.Services;
@@ -21,18 +21,6 @@ public class TourQueryService : ITourQueryService
     public async Task<IEnumerable<TourDto>> GetFilteredToursAsync(TourFilterDto filter)
     {
         var query = _unitOfWork.Tours.AsQueryable();
-
-        if (!string.IsNullOrWhiteSpace(filter.SearchQuery))
-        {
-            var search = filter.SearchQuery.Trim().ToLower();
-
-            query = query.Where(t =>
-                EF.Functions.Like(t.Name.ToLower(), $"%{search}%") || 
-            EF.Functions.Like(t.Type.ToString().ToLower(), $"%{search}%") || 
-            EF.Functions.Like(t.Country.ToLower(), $"%{search}%") || 
-            EF.Functions.Like(t.Region.ToLower(), $"%{search}%") ||
-            EF.Functions.Like(t.StartDate.ToString("yyyy-MM-dd"), $"%{search}%")); // по бажанню
-        }
 
         if (!string.IsNullOrWhiteSpace(filter.Country))
         {
@@ -70,6 +58,32 @@ public class TourQueryService : ITourQueryService
         if (filter.Price.HasValue)
         {
             query = query.Where(t => t.Price <= filter.Price.Value);
+        }
+
+        return await query
+            .ProjectTo<TourDto>(_mapper.ConfigurationProvider)
+            .ToListAsync();
+    }
+
+    public async Task<IEnumerable<TourDto>> SearchToursAsync(string searchQuery)
+    {
+        var query = _unitOfWork.Tours.AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(searchQuery))
+        {
+            var search = searchQuery.Trim().ToLower();
+
+            query = query.Where(t =>
+                EF.Functions.Like(t.Name.ToLower(), $"%{search}%") ||
+                EF.Functions.Like(t.Type.ToString().ToLower(), $"%{search}%") ||
+                EF.Functions.Like(t.Country.ToLower(), $"%{search}%") ||
+                EF.Functions.Like(t.Region.ToLower(), $"%{search}%")
+            );
+
+            if (DateTime.TryParse(search, out var parsedDate))
+            {
+                query = query.Where(t => t.StartDate.Date == parsedDate.Date);
+            }
         }
 
         return await query
