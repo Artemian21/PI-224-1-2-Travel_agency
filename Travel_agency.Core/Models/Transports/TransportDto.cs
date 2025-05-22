@@ -1,4 +1,4 @@
-﻿namespace Travel_agency.Core.Models;
+﻿namespace Travel_agency.Core.Models.Transports;
 
 public class TransportDto
 {
@@ -8,5 +8,4 @@ public class TransportDto
     public DateTime DepartureDate { get; set; }
     public DateTime ArrivalDate { get; set; }
     public decimal Price { get; set; }
-    public ICollection<TicketBookingDto> TicketBookings { get; set; } = new List<TicketBookingDto>();
 }

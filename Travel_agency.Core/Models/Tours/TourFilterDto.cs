@@ -1,6 +1,6 @@
 ﻿using Travel_agency.Core.Enums;
 
-namespace Travel_agency.Core.Models;
+namespace Travel_agency.Core.Models.Tours;
 
 public class TourFilterDto
 {
@@ -8,7 +8,6 @@ public class TourFilterDto
     public TypeTour? Type { get; set; }
     public DateTime? StartDateFrom { get; set; }
     public DateTime? StartDateTo { get; set; }
-    public string? SearchQuery { get; set; }
     public string? Name { get; set; }
     public string? Region { get; set; }
     public decimal? Price { get; set; }

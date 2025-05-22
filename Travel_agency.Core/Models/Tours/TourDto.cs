@@ -1,6 +1,6 @@
 ﻿using Travel_agency.Core.Enums;
 
-namespace Travel_agency.Core.Models;
+namespace Travel_agency.Core.Models.Tours;
 
 public class TourDto
 {
@@ -13,7 +13,4 @@ public class TourDto
     public DateTime EndDate { get; set; }
     public decimal Price { get; set; }
     public string? ImageUrl { get; set; }
-
-    public ICollection<TourBookingDto> TourBookings { get; set; } = new List<TourBookingDto>();
-
 }

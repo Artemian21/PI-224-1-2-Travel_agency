@@ -1,6 +1,6 @@
 ﻿using Travel_agency.Core.Enums;
 
-namespace Travel_agency.Core.Models;
+namespace Travel_agency.Core.Models.Tours;
 
 public class TourBookingDto
 {
@@ -9,6 +9,4 @@ public class TourBookingDto
     public Guid UserId { get; set; }
     public DateTime BookingDate { get; set; } = DateTime.UtcNow;
     public Status Status { get; set; } = Status.Pending;
-    public TourDto Tour { get; set; }
-    public UserDto User { get; set; }
 }
