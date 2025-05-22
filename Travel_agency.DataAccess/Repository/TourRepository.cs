@@ -23,6 +23,21 @@ namespace Travel_agency.DataAccess.Repository
             return await _context.Tours.AsNoTracking().ToListAsync();
         }
 
+        public async Task<IEnumerable<TourEntity>> GetToursPagedAsync(int pageNumber, int pageSize)
+        {
+            return await _context.Tours
+                .AsNoTracking()
+                .OrderBy(t => t.Name)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
+
+        public async Task<int> GetTotalToursCountAsync()
+        {
+            return await _context.Tours.CountAsync();
+        }
+
         public async Task<TourEntity> GetTourByIdAsync(Guid tourId)
         {
             return await _context.Tours.AsNoTracking()
