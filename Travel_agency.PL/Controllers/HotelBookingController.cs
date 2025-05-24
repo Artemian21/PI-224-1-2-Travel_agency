@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Travel_agency.BLL.Abstractions;
 using Travel_agency.BLL.Services;
@@ -10,6 +11,7 @@ namespace Travel_agency.PL.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class HotelBookingController : ControllerBase
     {
         private readonly IHotelBookingService _hotelBookingService;
@@ -22,8 +24,22 @@ namespace Travel_agency.PL.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllBookings()
         {
-            var bookings = await _hotelBookingService.GetAllHotelBookingsAsync();
-            return Ok(bookings);
+            var allBookings = await _hotelBookingService.GetAllHotelBookingsAsync();
+
+            if (User.IsInRole("Admin"))
+            {
+                return Ok(allBookings);
+            }
+            else
+            {
+                var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+                if (userIdClaim == null)
+                    return Unauthorized();
+
+                var userId = Guid.Parse(userIdClaim.Value);
+                var userBookings = allBookings.Where(b => b.UserId == userId).ToList();
+                return Ok(userBookings);
+            }
         }
 
         [HttpGet("{id}")]
@@ -45,9 +61,17 @@ namespace Travel_agency.PL.Controllers
                 return BadRequest("Hotel booking data is null.");
             }
 
+            var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+            {
+                return Unauthorized();
+            }
+
+            var userId = Guid.Parse(userIdClaim.Value);
+
             var hotelBookingDto = new HotelBookingDto
             {
-                UserId = hotelBooking.UserId,
+                UserId = userId,
                 HotelRoomId = hotelBooking.HotelRoomId,
                 StartDate = hotelBooking.StartDate,
                 EndDate = hotelBooking.EndDate,
@@ -67,10 +91,18 @@ namespace Travel_agency.PL.Controllers
                 return BadRequest("Hotel booking data is null.");
             }
 
+            var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+            {
+                return Unauthorized();
+            }
+
+            var userId = Guid.Parse(userIdClaim.Value);
+
             var hotelBookingDto = new HotelBookingDto
             {
                 Id = id,
-                UserId = hotelBooking.UserId,
+                UserId = userId,
                 HotelRoomId = hotelBooking.HotelRoomId,
                 StartDate = hotelBooking.StartDate,
                 EndDate = hotelBooking.EndDate,

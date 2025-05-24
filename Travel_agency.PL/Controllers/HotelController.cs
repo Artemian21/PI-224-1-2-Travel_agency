@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Travel_agency.BLL.Abstractions;
 using Travel_agency.Core.Models;
@@ -20,6 +21,7 @@ namespace Travel_agency.PL.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public async Task<IActionResult> GetAllHotels()
         {
             var hotels = await _hotelService.GetAllHotelsAsync();
@@ -27,6 +29,7 @@ namespace Travel_agency.PL.Controllers
         }
 
         [HttpGet("{id}")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetHotelById(Guid id)
         {
             var hotel = await _hotelService.GetHotelByIdAsync(id);
@@ -34,6 +37,7 @@ namespace Travel_agency.PL.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Administrator,Manager")]
         public async Task<IActionResult> CreateHotel([FromBody] HotelRequest hotel)
         {
             if (hotel == null)
@@ -54,6 +58,7 @@ namespace Travel_agency.PL.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "Administrator,Manager")]
         public async Task<IActionResult> UpdateHotel(Guid id, [FromBody] HotelRequest hotel)
         {
             if (hotel == null)
@@ -79,6 +84,7 @@ namespace Travel_agency.PL.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Administrator,Manager")]
         public async Task<IActionResult> DeleteHotel(Guid id)
         {
             await _hotelService.DeleteHotelAsync(id);

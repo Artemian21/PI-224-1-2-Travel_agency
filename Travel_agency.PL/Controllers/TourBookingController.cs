@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Travel_agency.BLL.Abstractions;
 using Travel_agency.Core.Models;
@@ -9,6 +10,7 @@ namespace Travel_agency.PL.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class TourBookingController : ControllerBase
     {
         private readonly ITourBookingService _tourBookingService;
@@ -21,8 +23,22 @@ namespace Travel_agency.PL.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllBookings()
         {
-            var bookings = await _tourBookingService.GetAllTourBookingsAsync();
-            return Ok(bookings);
+            var allBookings = await _tourBookingService.GetAllTourBookingsAsync();
+
+            if (User.IsInRole("Admin"))
+            {
+                return Ok(allBookings);
+            }
+            else
+            {
+                var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+                if (userIdClaim == null)
+                    return Unauthorized();
+
+                var userId = Guid.Parse(userIdClaim.Value);
+                var userBookings = allBookings.Where(b => b.UserId == userId).ToList();
+                return Ok(userBookings);
+            }
         }
 
         [HttpGet("{id}")]
@@ -44,9 +60,17 @@ namespace Travel_agency.PL.Controllers
                 return BadRequest("Tour booking data is null.");
             }
 
+            var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+            {
+                return Unauthorized();
+            }
+
+            var userId = Guid.Parse(userIdClaim.Value);
+
             var tourBookingDto = new TourBookingDto
             {
-                UserId = tourBooking.UserId,
+                UserId = userId,
                 TourId = tourBooking.TourId,
                 Status = tourBooking.Status
             };
@@ -63,10 +87,18 @@ namespace Travel_agency.PL.Controllers
                 return BadRequest("Tour booking data is null.");
             }
 
+            var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+            {
+                return Unauthorized();
+            }
+
+            var userId = Guid.Parse(userIdClaim.Value);
+
             var tourBookingDto = new TourBookingDto
             {
                 Id = id,
-                UserId = tourBooking.UserId,
+                UserId = userId,
                 TourId = tourBooking.TourId,
                 Status = tourBooking.Status
             };
