@@ -25,6 +25,8 @@ namespace Travel_agency.DataAccess.Configurations
                 .HasMaxLength(50)
                 .IsRequired();
 
+            builder.HasIndex(u => u.Email).IsUnique();
+
             builder.HasMany(u => u.HotelBookings)
                 .WithOne(hb => hb.User)
                 .HasForeignKey(hb => hb.UserId)

@@ -12,8 +12,8 @@ using Travel_agency.DataAccess;
 namespace Travel_agency.DataAccess.Migrations
 {
     [DbContext(typeof(TravelAgencyDbContext))]
-    [Migration("20250519131733_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20250524145710_UpdatedUserEntityAndConfig")]
+    partial class UpdatedUserEntityAndConfig
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -261,9 +261,9 @@ namespace Travel_agency.DataAccess.Migrations
                         .HasMaxLength(254)
                         .HasColumnType("nvarchar(254)");
 
-                    b.Property<byte[]>("Password")
+                    b.Property<string>("PasswordHash")
                         .IsRequired()
-                        .HasColumnType("varbinary(max)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Role")
                         .IsRequired()
@@ -276,6 +276,9 @@ namespace Travel_agency.DataAccess.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
 
                     b.ToTable("Users", (string)null);
                 });

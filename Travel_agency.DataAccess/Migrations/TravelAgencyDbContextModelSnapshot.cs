@@ -258,9 +258,9 @@ namespace Travel_agency.DataAccess.Migrations
                         .HasMaxLength(254)
                         .HasColumnType("nvarchar(254)");
 
-                    b.Property<byte[]>("PasswordHash")
+                    b.Property<string>("PasswordHash")
                         .IsRequired()
-                        .HasColumnType("varbinary(max)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Role")
                         .IsRequired()
@@ -273,6 +273,9 @@ namespace Travel_agency.DataAccess.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
 
                     b.ToTable("Users", (string)null);
                 });
