@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Travel_agency.BLL.Abstractions;
 using Travel_agency.Core.Enums;
@@ -20,6 +21,7 @@ namespace Travel_agency.PL.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> GetAllUsers()
         {
             var users = await _userService.GetAllUserAsync();
@@ -35,6 +37,7 @@ namespace Travel_agency.PL.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize(Roles = "Administrator,Manager")]
         public async Task<IActionResult> GetUserById(Guid id)
         {
             var user = await _userService.GetUserByIdAsync(id);
@@ -55,6 +58,7 @@ namespace Travel_agency.PL.Controllers
         }
 
         [HttpGet("email/{email}")]
+        [Authorize(Roles = "Administrator,Manager")]
         public async Task<IActionResult> GetUserByEmail(string email)
         {
             var user = await _userService.GetUserByEmailAsync(email);
@@ -75,6 +79,7 @@ namespace Travel_agency.PL.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize]
         public async Task<IActionResult> UpdateUser(Guid id, [FromBody] UserRequest user)
         {
             if (user == null)
@@ -82,12 +87,19 @@ namespace Travel_agency.PL.Controllers
                 return BadRequest("User data is null.");
             }
 
+            var currentUserRole = User.Claims.FirstOrDefault(c => c.Type == "role")?.Value;
+            var currentUserId = User.Claims.FirstOrDefault(c => c.Type == "nameidentifier")?.Value;
+
+            if (currentUserRole != "Administrator" && currentUserRole != "Manager" && currentUserId != id.ToString())
+            {
+                return Forbid();
+            }
+
             var userDto = new UserDto
             {
                 Id = id,
                 Username = user.Username,
-                Email = user.Email,
-                Role = user.Role
+                Email = user.Email
             };
 
             var updatedUser = await _userService.UpdateUserProfileAsync(userDto);
@@ -106,6 +118,7 @@ namespace Travel_agency.PL.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> DeleteUser(Guid id)
         {
             var user = await _userService.GetUserByIdAsync(id);
@@ -119,6 +132,7 @@ namespace Travel_agency.PL.Controllers
         }
 
         [HttpPut("role/{id}")]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> ChangeUserRole(Guid id, [FromBody] UserRole userRole)
         {
             if (userRole == null)

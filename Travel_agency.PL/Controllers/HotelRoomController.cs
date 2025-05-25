@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Travel_agency.BLL.Abstractions;
 using Travel_agency.Core.Models;
 using Travel_agency.Core.Models.Hotels;
@@ -20,6 +21,7 @@ namespace Travel_agency.PL.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public async Task<IActionResult> GetAllHotelRooms()
         {
             var hotelRooms = await _hotelRoomService.GetAllHotelRoomsAsync();
@@ -27,6 +29,7 @@ namespace Travel_agency.PL.Controllers
         }
 
         [HttpGet("{id}")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetHotelRoomById(Guid id)
         {
             var hotelRoom = await _hotelRoomService.GetHotelRoomByIdAsync(id);
@@ -38,6 +41,7 @@ namespace Travel_agency.PL.Controllers
         }
 
         [HttpGet("hotel/{hotelId}/rooms")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetHotelRoomsByHotelId(Guid hotelId)
         {
             var rooms = await _hotelRoomService.GetHotelRoomsByHotelIdAsync(hotelId);
@@ -45,6 +49,7 @@ namespace Travel_agency.PL.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Administrator,Manager")]
         public async Task<IActionResult> CreateHotelRoom([FromBody] HotelRoomRequest hotelRoom)
         {
             if (hotelRoom == null)
@@ -65,6 +70,7 @@ namespace Travel_agency.PL.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "Administrator,Manager")]
         public async Task<IActionResult> UpdateHotelRoom(Guid id, [FromBody] HotelRoomRequest hotelRoom)
         {
             if (hotelRoom == null)
@@ -90,6 +96,7 @@ namespace Travel_agency.PL.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Administrator,Manager")]
         public async Task<IActionResult> DeleteHotelRoom(Guid id)
         {
             var hotelRoom = await _hotelRoomService.GetHotelRoomByIdAsync(id);

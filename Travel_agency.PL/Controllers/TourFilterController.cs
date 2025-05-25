@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Travel_agency.BLL.Abstractions;
 using Travel_agency.BLL.Services;
@@ -18,6 +19,7 @@ namespace Travel_agency.PL.Controllers
         }
 
         [HttpPost("filter")]
+        [AllowAnonymous]
         public async Task<IActionResult> FilterTours([FromBody] TourFilterDto tourFilterDto)
         {
             var filteredTours = await _tourQueryService.GetFilteredToursAsync(tourFilterDto);
@@ -25,6 +27,7 @@ namespace Travel_agency.PL.Controllers
         }
 
         [HttpGet("search/{searchQuary}")]
+        [AllowAnonymous]
         public async Task<IActionResult> SearchTours(string searchQuary)
         {
             var searchedTours = await _tourQueryService.SearchToursAsync(searchQuary);

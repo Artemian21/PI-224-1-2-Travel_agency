@@ -5,7 +5,6 @@ namespace Travel_agency.PL.Models
 {
     public record UserRequest(
         string Username,
-        [EmailAddress] string Email,
-        UserRole Role
+        [EmailAddress] string Email
         );
 }

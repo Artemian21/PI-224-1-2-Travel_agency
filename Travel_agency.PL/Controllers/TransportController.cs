@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Cryptography.Xml;
 using Travel_agency.BLL.Abstractions;
@@ -21,6 +22,7 @@ namespace Travel_agency.PL.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public async Task<IActionResult> GetAllTransports()
         {
             var transports = await _transportService.GetAllTransportsAsync();
@@ -28,6 +30,7 @@ namespace Travel_agency.PL.Controllers
         }
 
         [HttpGet("{id}")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetTransportById(Guid id)
         {
             var transport = await _transportService.GetTransportByIdAsync(id);
@@ -39,6 +42,7 @@ namespace Travel_agency.PL.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Administrator,Manager")]
         public async Task<IActionResult> CreateTransport([FromBody] TransportRequest transport)
         {
             if (transport == null)
@@ -60,6 +64,7 @@ namespace Travel_agency.PL.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "Administrator,Manager")]
         public async Task<IActionResult> UpdateTransport(Guid id, [FromBody] TransportRequest transport)
         {
             if (transport == null)
@@ -86,6 +91,7 @@ namespace Travel_agency.PL.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Administrator,Manager")]
         public async Task<IActionResult> DeleteTransport(Guid id)
         {
             var transport = await _transportService.GetTransportByIdAsync(id);

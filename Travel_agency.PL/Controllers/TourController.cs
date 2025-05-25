@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Travel_agency.BLL.Abstractions;
 using Travel_agency.Core.Models.Tours;
@@ -18,6 +19,7 @@ namespace Travel_agency.PL.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public async Task<IActionResult> GetAllTours()
         {
             var tours = await _tourService.GetAllToursAsync();
@@ -25,6 +27,7 @@ namespace Travel_agency.PL.Controllers
         }
 
         [HttpGet("paged")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetPagedTours([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
             var pagedResult = await _tourService.GetPagedToursAsync(pageNumber, pageSize);
@@ -32,6 +35,7 @@ namespace Travel_agency.PL.Controllers
         }
 
         [HttpGet("{id}")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetTourById(Guid id)
         {
             var tour = await _tourService.GetTourByIdAsync(id);
@@ -43,6 +47,7 @@ namespace Travel_agency.PL.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Manager,Administrator")]
         public async Task<IActionResult> CreateTour([FromBody] TourRequest tour)
         {
             if (tour == null)
@@ -67,6 +72,7 @@ namespace Travel_agency.PL.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "Manager,Administrator")]
         public async Task<IActionResult> UpdateTour(Guid id, [FromBody] TourRequest tour)
         {
             if (tour == null)
@@ -95,6 +101,7 @@ namespace Travel_agency.PL.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Manager,Administrator")]
         public async Task<IActionResult> DeleteTour(Guid id)
         {
             var deleted = await _tourService.DeleteTourAsync(id);
