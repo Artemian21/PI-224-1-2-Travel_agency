@@ -1,9 +1,12 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 using Travel_agency.BLL.Abstractions;
 using Travel_agency.Core.Models;
 using Travel_agency.Core.Models.Hotels;
-using Travel_agency.PL.Models;
+using Travel_agency.PL.Models.Requests;
+using Travel_agency.PL.Models.Responses;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -14,10 +17,12 @@ namespace Travel_agency.PL.Controllers
     public class HotelRoomController : ControllerBase
     {
         private readonly IHotelRoomService _hotelRoomService;
+        private readonly IMapper _mapper;
 
-        public HotelRoomController(IHotelRoomService hotelRoomService)
+        public HotelRoomController(IHotelRoomService hotelRoomService, IMapper mapper)
         {
             _hotelRoomService = hotelRoomService;
+            _mapper = mapper;
         }
 
         [HttpGet]
@@ -25,7 +30,7 @@ namespace Travel_agency.PL.Controllers
         public async Task<IActionResult> GetAllHotelRooms()
         {
             var hotelRooms = await _hotelRoomService.GetAllHotelRoomsAsync();
-            return Ok(hotelRooms);
+            return Ok(_mapper.Map<List<HotelRoomResponse>>(hotelRooms));
         }
 
         [HttpGet("{id}")]
@@ -45,7 +50,7 @@ namespace Travel_agency.PL.Controllers
         public async Task<IActionResult> GetHotelRoomsByHotelId(Guid hotelId)
         {
             var rooms = await _hotelRoomService.GetHotelRoomsByHotelIdAsync(hotelId);
-            return Ok(rooms);
+            return Ok(_mapper.Map<List<HotelRoomResponse>>(rooms));
         }
 
         [HttpPost]
@@ -57,16 +62,10 @@ namespace Travel_agency.PL.Controllers
                 return BadRequest("Invalid hotel room data");
             }
 
-            var hotelRoomDto = new HotelRoomDto
-            {
-                RoomType = hotelRoom.RoomType,
-                Capacity = hotelRoom.Capacity,
-                PricePerNight = hotelRoom.PricePerNight,
-                HotelId = hotelRoom.HotelId
-            };
+            var hotelRoomDto = _mapper.Map<HotelRoomDto>(hotelRoom);
 
             var createdHotelRoom = await _hotelRoomService.AddHotelRoomAsync(hotelRoomDto);
-            return Ok(createdHotelRoom);
+            return Ok(_mapper.Map<HotelRoomResponse>(createdHotelRoom));
         }
 
         [HttpPut("{id}")]
@@ -78,21 +77,15 @@ namespace Travel_agency.PL.Controllers
                 return BadRequest("Invalid hotel room data");
             }
 
-            var hotelRoomDto = new HotelRoomDto
-            {
-                Id = id,
-                RoomType = hotelRoom.RoomType,
-                Capacity = hotelRoom.Capacity,
-                PricePerNight = hotelRoom.PricePerNight,
-                HotelId = hotelRoom.HotelId
-            };
+            var hotelRoomDto = _mapper.Map<HotelRoomDto>(hotelRoom);
+            hotelRoomDto.Id = id;
 
             var updatedHotelRoom = await _hotelRoomService.UpdateHotelRoomAsync(hotelRoomDto);
             if (updatedHotelRoom == null)
             {
                 return NotFound();
             }
-            return Ok(updatedHotelRoom);
+            return Ok(_mapper.Map<HotelRoomResponse>(updatedHotelRoom));
         }
 
         [HttpDelete("{id}")]

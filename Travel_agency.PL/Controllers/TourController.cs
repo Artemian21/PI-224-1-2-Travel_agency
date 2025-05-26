@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Travel_agency.BLL.Abstractions;
 using Travel_agency.Core.Models.Tours;
-using Travel_agency.PL.Models;
+using Travel_agency.PL.Models.Requests;
+using Travel_agency.PL.Models.Responses;
 
 namespace Travel_agency.PL.Controllers
 {
@@ -12,10 +14,12 @@ namespace Travel_agency.PL.Controllers
     public class TourController : ControllerBase
     {
         private readonly ITourService _tourService;
+        private readonly IMapper _mapper;
 
-        public TourController(ITourService tourService)
+        public TourController(ITourService tourService, IMapper mapper)
         {
             _tourService = tourService;
+            _mapper = mapper;
         }
 
         [HttpGet]
@@ -23,7 +27,7 @@ namespace Travel_agency.PL.Controllers
         public async Task<IActionResult> GetAllTours()
         {
             var tours = await _tourService.GetAllToursAsync();
-            return Ok(tours);
+            return Ok(_mapper.Map<List<TourResponse>>(tours));
         }
 
         [HttpGet("paged")]
@@ -55,20 +59,10 @@ namespace Travel_agency.PL.Controllers
                 return BadRequest("Tour data is null.");
             }
 
-            var tourDto = new TourDto
-            {
-                Name = tour.Name,
-                Type = tour.Type,
-                Country = tour.Country,
-                Region = tour.Region,
-                StartDate = tour.StartDate,
-                EndDate = tour.EndDate,
-                Price = tour.Price,
-                ImageUrl = tour.ImageUrl
-            };
+            var tourDto = _mapper.Map<TourDto>(tour);
 
             var createdTour = await _tourService.AddTourAsync(tourDto);
-            return Ok(createdTour);
+            return Ok(_mapper.Map<TourResponse>(createdTour));
         }
 
         [HttpPut("{id}")]
@@ -80,24 +74,15 @@ namespace Travel_agency.PL.Controllers
                 return BadRequest("Tour data is null.");
             }
 
-            var tourDto = new TourDto
-            {
-                Id = id,
-                Name = tour.Name,
-                Type = tour.Type,
-                Country = tour.Country,
-                Region = tour.Region,
-                StartDate = tour.StartDate,
-                EndDate = tour.EndDate,
-                Price = tour.Price,
-                ImageUrl = tour.ImageUrl
-            };
+            var tourDto = _mapper.Map<TourDto>(tour);
+            tourDto.Id = id;
+
             var updatedTour = await _tourService.UpdateTourAsync(tourDto);
             if (updatedTour == null)
             {
                 return NotFound();
             }
-            return Ok(updatedTour);
+            return Ok(_mapper.Map<TourResponse>(updatedTour));
         }
 
         [HttpDelete("{id}")]

@@ -1,11 +1,13 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Travel_agency.BLL.Abstractions;
 using Travel_agency.BLL.Services;
 using Travel_agency.Core.Models;
 using Travel_agency.Core.Models.Transports;
-using Travel_agency.PL.Models;
+using Travel_agency.PL.Models.Requests;
+using Travel_agency.PL.Models.Responses;
 
 namespace Travel_agency.PL.Controllers
 {
@@ -15,10 +17,12 @@ namespace Travel_agency.PL.Controllers
     public class TicketBookingController : ControllerBase
     {
         private readonly ITicketBookingService _ticketBookingService;
+        private readonly IMapper _mapper;
 
-        public TicketBookingController(ITicketBookingService ticketBookingService)
+        public TicketBookingController(ITicketBookingService ticketBookingService, IMapper mapper)
         {
             _ticketBookingService = ticketBookingService;
+            _mapper = mapper;
         }
 
         [HttpGet]
@@ -28,7 +32,7 @@ namespace Travel_agency.PL.Controllers
 
             if (User.IsInRole("Admin"))
             {
-                return Ok(allBookings);
+                return Ok(_mapper.Map<List<TicketBookingResponse>>(allBookings));
             }
             else
             {
@@ -38,7 +42,7 @@ namespace Travel_agency.PL.Controllers
 
                 var userId = Guid.Parse(userIdClaim.Value);
                 var userBookings = allBookings.Where(b => b.UserId == userId).ToList();
-                return Ok(userBookings);
+                return Ok(_mapper.Map<List<TicketBookingResponse>>(userBookings));
             }
         }
 
@@ -96,19 +100,17 @@ namespace Travel_agency.PL.Controllers
 
             var userId = Guid.Parse(userIdClaim.Value);
 
-            var ticketBookingDto = new TicketBookingDto
-            {
-                Id = id,
-                UserId = userId,
-                TransportId = ticketBooking.TransportId,
-                Status = ticketBooking.Status
-            };
+            var ticketBookingDto = _mapper.Map<TicketBookingDto>(ticketBooking);
+            ticketBookingDto.Id = id;
+            ticketBookingDto.UserId = userId;
+
+
             var updatedBooking = await _ticketBookingService.UpdateTicketBookingAsync(ticketBookingDto);
             if (updatedBooking == null)
             {
                 return NotFound();
             }
-            return Ok(updatedBooking);
+            return Ok(_mapper.Map<HotelRoomResponse>(updatedBooking));
         }
 
         [HttpDelete("{id}")]

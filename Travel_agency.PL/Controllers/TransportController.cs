@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Cryptography.Xml;
@@ -6,7 +7,8 @@ using Travel_agency.BLL.Abstractions;
 using Travel_agency.BLL.Services;
 using Travel_agency.Core.Models;
 using Travel_agency.Core.Models.Transports;
-using Travel_agency.PL.Models;
+using Travel_agency.PL.Models.Requests;
+using Travel_agency.PL.Models.Responses;
 
 namespace Travel_agency.PL.Controllers
 {
@@ -15,10 +17,12 @@ namespace Travel_agency.PL.Controllers
     public class TransportController : ControllerBase
     {
         private readonly ITransportService _transportService;
+        private readonly IMapper _mapper;
 
-        public TransportController(ITransportService transportService)
+        public TransportController(ITransportService transportService, IMapper mapper)
         {
             _transportService = transportService;
+            _mapper = mapper;
         }
 
         [HttpGet]
@@ -26,7 +30,7 @@ namespace Travel_agency.PL.Controllers
         public async Task<IActionResult> GetAllTransports()
         {
             var transports = await _transportService.GetAllTransportsAsync();
-            return Ok(transports);
+            return Ok(_mapper.Map<List<TransportResponse>>(transports));
         }
 
         [HttpGet("{id}")]
@@ -50,17 +54,10 @@ namespace Travel_agency.PL.Controllers
                 return BadRequest("Transport data is null.");
             }
 
-            var transportDto = new TransportDto
-            {
-                Type = transport.Type,
-                Company = transport.Company,
-                DepartureDate = transport.DepartureDate,
-                ArrivalDate = transport.ArrivalDate,
-                Price = transport.Price
-            };
+            var transportDto = _mapper.Map<TransportDto>(transport);
 
             var createdTransport = await _transportService.AddTransportAsync(transportDto);
-            return Ok(createdTransport);
+            return Ok(_mapper.Map<TransportResponse>(createdTransport));
         }
 
         [HttpPut("{id}")]
@@ -71,23 +68,16 @@ namespace Travel_agency.PL.Controllers
             {
                 return BadRequest("Transport data is null.");
             }
-            
-            var transportDto = new TransportDto
-            {
-                Id = id,
-                Type = transport.Type,
-                Company = transport.Company,
-                DepartureDate = transport.DepartureDate,
-                ArrivalDate = transport.ArrivalDate,
-                Price = transport.Price
-            };
+
+            var transportDto = _mapper.Map<TransportDto>(transport);
+            transportDto.Id = id;
 
             var updatedTransport = await _transportService.UpdateTransportAsync(transportDto);
             if (updatedTransport == null)
             {
                 return NotFound();
             }
-            return Ok(updatedTransport);
+            return Ok(_mapper.Map<TransportResponse>(updatedTransport));
         }
 
         [HttpDelete("{id}")]
