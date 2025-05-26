@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using Travel_agency.BLL.Abstractions;
 using Travel_agency.BLL.Auth;
@@ -10,6 +11,7 @@ using Travel_agency.BLL.Services;
 using Travel_agency.DataAccess;
 using Travel_agency.DataAccess.Abstraction;
 using Travel_agency.DataAccess.Repository;
+using Travel_agency.PL.Middlewares;
 using Travel_agency.PL.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -54,7 +56,38 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"]))
         };
+
+        options.Events = new JwtBearerEvents
+        {
+            OnChallenge = context =>
+            {
+                context.HandleResponse();
+                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                context.Response.ContentType = "application/json";
+                var result = JsonSerializer.Serialize(new
+                {
+                    error = "Unauthorized",
+                    statusCode = 401,
+                    message = "Token is missing or invalid"
+                });
+                return context.Response.WriteAsync(result);
+            },
+            OnForbidden = context =>
+            {
+                context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                context.Response.ContentType = "application/json";
+                var result = JsonSerializer.Serialize(new
+                {
+                    error = "Forbidden",
+                    statusCode = 403,
+                    message = "You are not allowed to access this resource"
+                });
+                return context.Response.WriteAsync(result);
+            }
+        };
+
     });
+
 builder.Services.AddAuthorization();
 
 builder.Services.AddControllers()
@@ -98,6 +131,8 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 var app = builder.Build();
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 using (var scope = app.Services.CreateScope())
 {
