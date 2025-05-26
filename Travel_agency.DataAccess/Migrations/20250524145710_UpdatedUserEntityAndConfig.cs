@@ -11,7 +11,7 @@ namespace Travel_agency.DataAccess.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "Password",
+                name: "PasswordHash",
                 table: "Users");
 
             migrationBuilder.AddColumn<string>(
