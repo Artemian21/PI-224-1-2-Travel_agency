@@ -1,6 +1,7 @@
 ﻿using AutoFixture;
 using Travel_agency.BLL.Abstractions;
 using Travel_agency.BLL.Auth;
+namespace Travel_agency.Tests.AuthTests;
 
 public class PasswordHasherTests
 {
