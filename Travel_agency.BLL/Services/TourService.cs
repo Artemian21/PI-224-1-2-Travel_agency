@@ -72,7 +72,7 @@ namespace Travel_agency.BLL.Services
             var updatedTourEntity = await _unitOfWork.Tours.UpdateTourAsync(tourEntity);
 
             if (updatedTourEntity == null)
-                throw new NotFoundException($"Tour with ID {updatedTourEntity.Id} not found.");
+                throw new NotFoundException($"Tour with ID {tourDto.Id} not found.");
 
             return _mapper.Map<TourDto>(updatedTourEntity);
         }
