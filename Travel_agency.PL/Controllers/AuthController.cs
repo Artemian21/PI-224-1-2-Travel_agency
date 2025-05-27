@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using Travel_agency.BLL.Abstractions;
 using Travel_agency.Core.Models.Users;
+using Travel_agency.PL.Models.Requests;
+using Travel_agency.PL.Models.Responses;
 
 namespace Travel_agency.PL.Controllers
 {
@@ -12,18 +14,20 @@ namespace Travel_agency.PL.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
+        private readonly IMapper _mapper;
 
-        public AuthController(IAuthService authService)
+        public AuthController(IAuthService authService, IMapper mapper)
         {
             _authService = authService;
+            _mapper = mapper;
         }
 
         [HttpPost("register")]
         [AllowAnonymous]
-        public async Task<IActionResult> Register([FromBody] RegisterUserDto registerDto)
+        public async Task<IActionResult> Register([FromBody] RegisterUserRequest registerDto)
         {
-            var user = await _authService.Register(registerDto);
-            return Ok(user);
+            var user = await _authService.Register(_mapper.Map<RegisterUserDto>(registerDto));
+            return Ok(_mapper.Map<UserResponse>(user));
         }
 
         [HttpPost("login")]

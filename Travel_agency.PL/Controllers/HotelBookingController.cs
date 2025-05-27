@@ -1,11 +1,13 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Travel_agency.BLL.Abstractions;
 using Travel_agency.BLL.Services;
 using Travel_agency.Core.Models;
 using Travel_agency.Core.Models.Hotels;
-using Travel_agency.PL.Models;
+using Travel_agency.PL.Models.Requests;
+using Travel_agency.PL.Models.Responses;
 
 namespace Travel_agency.PL.Controllers
 {
@@ -15,10 +17,12 @@ namespace Travel_agency.PL.Controllers
     public class HotelBookingController : ControllerBase
     {
         private readonly IHotelBookingService _hotelBookingService;
+        private readonly IMapper _mapper;
 
-        public HotelBookingController(IHotelBookingService hotelBookingService)
+        public HotelBookingController(IHotelBookingService hotelBookingService, IMapper mapper)
         {
             _hotelBookingService = hotelBookingService;
+            _mapper = mapper;
         }
 
         [HttpGet]
@@ -28,7 +32,7 @@ namespace Travel_agency.PL.Controllers
 
             if (User.IsInRole("Admin"))
             {
-                return Ok(allBookings);
+                return Ok(_mapper.Map<List<HotelBookingResponse>>(allBookings));
             }
             else
             {
@@ -38,7 +42,7 @@ namespace Travel_agency.PL.Controllers
 
                 var userId = Guid.Parse(userIdClaim.Value);
                 var userBookings = allBookings.Where(b => b.UserId == userId).ToList();
-                return Ok(userBookings);
+                return Ok(_mapper.Map<List<HotelBookingResponse>>(userBookings));
             }
         }
 
@@ -50,7 +54,7 @@ namespace Travel_agency.PL.Controllers
             {
                 return NotFound();
             }
-            return Ok(booking);
+            return Ok(_mapper.Map<HotelBookingDetailsResponse>(booking));
         }
 
         [HttpPost]
@@ -69,18 +73,11 @@ namespace Travel_agency.PL.Controllers
 
             var userId = Guid.Parse(userIdClaim.Value);
 
-            var hotelBookingDto = new HotelBookingDto
-            {
-                UserId = userId,
-                HotelRoomId = hotelBooking.HotelRoomId,
-                StartDate = hotelBooking.StartDate,
-                EndDate = hotelBooking.EndDate,
-                NumberOfGuests = hotelBooking.NumberOfGuests,
-                Status = hotelBooking.Status
-            };
+            var hotelBookingDto = _mapper.Map<HotelBookingDto>(hotelBooking);
+            hotelBookingDto.UserId = userId;
 
             var createdBooking = await _hotelBookingService.AddHotelBookingAsync(hotelBookingDto);
-            return Ok(createdBooking);
+            return Ok(_mapper.Map<HotelBookingResponse>(createdBooking));
         }
 
             [HttpPut("{id}")]
@@ -99,22 +96,16 @@ namespace Travel_agency.PL.Controllers
 
             var userId = Guid.Parse(userIdClaim.Value);
 
-            var hotelBookingDto = new HotelBookingDto
-            {
-                Id = id,
-                UserId = userId,
-                HotelRoomId = hotelBooking.HotelRoomId,
-                StartDate = hotelBooking.StartDate,
-                EndDate = hotelBooking.EndDate,
-                NumberOfGuests = hotelBooking.NumberOfGuests,
-                Status = hotelBooking.Status
-            };
+            var hotelBookingDto = _mapper.Map<HotelBookingDto>(hotelBooking);
+            hotelBookingDto.Id = id;
+            hotelBookingDto.UserId = userId;
+
             var updatedBooking = await _hotelBookingService.UpdateHotelBookingAsync(hotelBookingDto);
             if (updatedBooking == null)
             {
                 return NotFound();
             }
-            return Ok(updatedBooking);
+            return Ok(_mapper.Map<HotelBookingResponse>(updatedBooking));
         }
 
         [HttpDelete("{id}")]

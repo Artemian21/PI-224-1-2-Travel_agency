@@ -1,6 +1,6 @@
-﻿namespace Travel_agency.PL.Models
+﻿namespace Travel_agency.PL.Models.Requests
 {
-    public record TransportRequest (
+    public record TransportRequest(
         string Type,
         string Company,
         DateTime DepartureDate,

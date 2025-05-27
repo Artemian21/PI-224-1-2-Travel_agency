@@ -1,5 +1,3 @@
-version: '3.4'
-
 services:
   mssql-server:
     image: mcr.microsoft.com/mssql/server:2022-latest
@@ -9,6 +7,11 @@ services:
       - SA_PASSWORD=My21252006AA!
     ports:
       - "1433:1433"
+    healthcheck:
+      test: ["CMD", "/opt/mssql-tools/bin/sqlcmd", "-S", "localhost", "-U", "sa", "-P", "My21252006AA!", "-Q", "SELECT 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - app-network
 
@@ -23,10 +26,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Server=mssql-server;Database=TravelAgencyDB;User=sa;Password=My21252006AA!;TrustServerCertificate=True
     depends_on:
-      - mssql-server
+      mssql-server:
+        condition: service_healthy
     networks:
       - app-network
-
-networks:
-  app-network:
-    driver: bridge

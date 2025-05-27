@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Travel_agency.BLL.Abstractions;
 using Travel_agency.Core.Models;
 using Travel_agency.Core.Models.Tours;
-using Travel_agency.PL.Models;
+using Travel_agency.PL.Models.Requests;
+using Travel_agency.PL.Models.Responses;
 
 namespace Travel_agency.PL.Controllers
 {
@@ -14,10 +16,12 @@ namespace Travel_agency.PL.Controllers
     public class TourBookingController : ControllerBase
     {
         private readonly ITourBookingService _tourBookingService;
+        private readonly IMapper _mapper;
 
-        public TourBookingController(ITourBookingService tourBookingService)
+        public TourBookingController(ITourBookingService tourBookingService, IMapper mapper)
         {
             _tourBookingService = tourBookingService;
+            _mapper = mapper;
         }
 
         [HttpGet]
@@ -27,7 +31,7 @@ namespace Travel_agency.PL.Controllers
 
             if (User.IsInRole("Admin"))
             {
-                return Ok(allBookings);
+                return Ok(_mapper.Map<List<TourBookingResponse>>(allBookings));
             }
             else
             {
@@ -37,7 +41,7 @@ namespace Travel_agency.PL.Controllers
 
                 var userId = Guid.Parse(userIdClaim.Value);
                 var userBookings = allBookings.Where(b => b.UserId == userId).ToList();
-                return Ok(userBookings);
+                return Ok(_mapper.Map<List<TourBookingResponse>>(userBookings));
             }
         }
 
@@ -49,7 +53,7 @@ namespace Travel_agency.PL.Controllers
             {
                 return NotFound();
             }
-            return Ok(booking);
+            return Ok(_mapper.Map<TourBookingDetailsResponse>(booking));
         }
 
         [HttpPost]
@@ -68,15 +72,11 @@ namespace Travel_agency.PL.Controllers
 
             var userId = Guid.Parse(userIdClaim.Value);
 
-            var tourBookingDto = new TourBookingDto
-            {
-                UserId = userId,
-                TourId = tourBooking.TourId,
-                Status = tourBooking.Status
-            };
+            var tourBookingDto = _mapper.Map<TourBookingDto>(tourBooking);
+            tourBookingDto.UserId = userId;
 
             var createdBooking = await _tourBookingService.AddTourBookingAsync(tourBookingDto);
-            return Ok(createdBooking);
+            return Ok(_mapper.Map<TourBookingResponse>(_mapper));
         }
 
         [HttpPut("{id}")]
@@ -95,20 +95,16 @@ namespace Travel_agency.PL.Controllers
 
             var userId = Guid.Parse(userIdClaim.Value);
 
-            var tourBookingDto = new TourBookingDto
-            {
-                Id = id,
-                UserId = userId,
-                TourId = tourBooking.TourId,
-                Status = tourBooking.Status
-            };
+            var tourBookingDto = _mapper.Map<TourBookingDto>(tourBooking);
+            tourBookingDto.Id = id;
+            tourBookingDto.UserId = userId;
 
             var updatedBooking = await _tourBookingService.UpdateTourBookingAsync(tourBookingDto);
             if (updatedBooking == null)
             {
                 return NotFound();
             }
-            return Ok(updatedBooking);
+            return Ok(_mapper.Map<TourBookingResponse>(updatedBooking));
         }
 
         [HttpDelete("{id}")]

@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Travel_agency.BLL.Abstractions;
 using Travel_agency.Core.Models;
 using Travel_agency.Core.Models.Hotels;
-using Travel_agency.PL.Models;
+using Travel_agency.PL.Models.Requests;
+using Travel_agency.PL.Models.Responses;
 
 
 namespace Travel_agency.PL.Controllers
@@ -14,10 +16,12 @@ namespace Travel_agency.PL.Controllers
     public class HotelController : ControllerBase
     {
         private readonly IHotelService _hotelService;
+        private readonly IMapper _mapper;
 
-        public HotelController(IHotelService hotelService)
+        public HotelController(IHotelService hotelService, IMapper mapper)
         {
             _hotelService = hotelService;
+            _mapper = mapper;
         }
 
         [HttpGet]
@@ -25,7 +29,7 @@ namespace Travel_agency.PL.Controllers
         public async Task<IActionResult> GetAllHotels()
         {
             var hotels = await _hotelService.GetAllHotelsAsync();
-            return Ok(hotels);
+            return Ok(_mapper.Map<List<HotelResponse>>(hotels));
         }
 
         [HttpGet("{id}")]
@@ -45,16 +49,10 @@ namespace Travel_agency.PL.Controllers
                 return BadRequest("Invalid hotel data");
             }
 
-            var hotelDto = new HotelDto
-            {
-                Name = hotel.Name,
-                Country = hotel.Country,
-                City = hotel.City,
-                Address = hotel.Address
-            }; 
+            var hotelDto = _mapper.Map<HotelDto>(hotel);
 
             var createdHotel = await _hotelService.AddHotelAsync(hotelDto);
-            return Ok(createdHotel);
+            return Ok(_mapper.Map<HotelResponse>(createdHotel));
         }
 
         [HttpPut("{id}")]
@@ -66,21 +64,15 @@ namespace Travel_agency.PL.Controllers
                 return BadRequest("Invalid hotel data");
             }
 
-            var hotelDto = new HotelDto
-            {
-                Id = id,
-                Name = hotel.Name,
-                Country = hotel.Country,
-                City = hotel.City,
-                Address = hotel.Address
-            };
+            var hotelDto = _mapper.Map<HotelDto>(hotel);
+            hotelDto.Id = id;
 
             var updatedHotel = await _hotelService.UpdateHotelAsync(hotelDto);
             if (updatedHotel == null)
             {
                 return NotFound();
             }
-            return Ok(updatedHotel);
+            return Ok(_mapper.Map<HotelResponse>(updatedHotel));
         }
 
         [HttpDelete("{id}")]

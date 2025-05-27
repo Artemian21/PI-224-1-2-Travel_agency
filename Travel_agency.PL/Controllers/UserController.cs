@@ -1,11 +1,13 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Travel_agency.BLL.Abstractions;
 using Travel_agency.Core.Enums;
 using Travel_agency.Core.Models;
 using Travel_agency.Core.Models.Users;
-using Travel_agency.PL.Models;
+using Travel_agency.PL.Models.Requests;
+using Travel_agency.PL.Models.Responses;
 
 namespace Travel_agency.PL.Controllers
 {
@@ -14,10 +16,12 @@ namespace Travel_agency.PL.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
+        private readonly IMapper _mapper;
 
-        public UserController(IUserService userService)
+        public UserController(IUserService userService, IMapper mapper)
         {
             _userService = userService;
+            _mapper = mapper;
         }
 
         [HttpGet]
@@ -25,15 +29,7 @@ namespace Travel_agency.PL.Controllers
         public async Task<IActionResult> GetAllUsers()
         {
             var users = await _userService.GetAllUserAsync();
-            var userResponse = users.Select(user => new UserResponse
-            (
-                user.Id,
-                user.Username,
-                user.Email,
-                user.Role
-            ));
-
-            return Ok(userResponse);
+            return Ok(_mapper.Map<List<UserResponse>>(users));
         }
 
         [HttpGet("{id}")]
@@ -46,15 +42,7 @@ namespace Travel_agency.PL.Controllers
                 return NotFound();
             }
 
-            var userResponse = new UserResponse
-            (
-                user.Id,
-                user.Username,
-                user.Email,
-                user.Role
-            );
-
-            return Ok(userResponse);
+            return Ok(user);
         }
 
         [HttpGet("email/{email}")]
@@ -67,15 +55,7 @@ namespace Travel_agency.PL.Controllers
                 return NotFound();
             }
 
-            var userResponse = new UserResponse
-            (
-                user.Id,
-                user.Username,
-                user.Email,
-                user.Role
-            );
-
-            return Ok(userResponse);
+            return Ok(user);
         }
 
         [HttpPut("{id}")]
@@ -95,26 +75,22 @@ namespace Travel_agency.PL.Controllers
                 return Forbid();
             }
 
-            var userDto = new UserDto
+            var existingUser = await _userService.GetUserByIdAsync(id);
+            if (existingUser == null)
             {
-                Id = id,
-                Username = user.Username,
-                Email = user.Email
-            };
+                return NotFound();
+            }
 
-            var updatedUser = await _userService.UpdateUserProfileAsync(userDto);
+            existingUser.Username = user.Username;
+            existingUser.Email = user.Email;
+
+            var updatedUser = await _userService.UpdateUserProfileAsync(existingUser);
             if (updatedUser == null)
             {
                 return NotFound();
             }
-            var userResponse = new UserResponse
-            (
-                updatedUser.Id,
-                updatedUser.Username,
-                updatedUser.Email,
-                updatedUser.Role
-            );
-            return Ok(userResponse);
+
+            return Ok(_mapper.Map<UserResponse>(updatedUser));
         }
 
         [HttpDelete("{id}")]

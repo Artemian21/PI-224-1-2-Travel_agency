@@ -11,12 +11,13 @@ using Travel_agency.BLL.Services;
 using Travel_agency.DataAccess;
 using Travel_agency.DataAccess.Abstraction;
 using Travel_agency.DataAccess.Repository;
+using Travel_agency.PL;
+using Travel_agency.PL.Models.Requests;
 using Travel_agency.PL.Middlewares;
-using Travel_agency.PL.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<TravelAgencyDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("LocalConnection"))); // Use Local or Default connection string 
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))); // Use Local or Default connection string 
 
 builder.Services.AddScoped<IHotelBookingRepository, HotelBookingRepository>();
 builder.Services.AddScoped<IHotelRepository, HotelRepository>();
@@ -28,6 +29,7 @@ builder.Services.AddScoped<ITransportRepository, TransportRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
+builder.Services.AddAutoMapper(typeof(PLMappingProfile).Assembly);
 
 builder.Services.AddScoped<IHotelBookingService, HotelBookingService>();
 builder.Services.AddScoped<IHotelService, HotelService>();
