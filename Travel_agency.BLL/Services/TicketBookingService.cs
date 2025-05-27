@@ -56,7 +56,7 @@ namespace Travel_agency.BLL.Services
             var ticketBookingEntity = _mapper.Map<TicketBookingEntity>(ticketBookingDto);
             var updatedTicketBookingEntity = await _unitOfWork.TicketBookings.UpdateTicketBookingAsync(ticketBookingEntity);
             if (updatedTicketBookingEntity == null)
-                throw new NotFoundException($"Ticket Booking with ID {updatedTicketBookingEntity.Id} not found.");
+                throw new NotFoundException($"Ticket Booking with ID {ticketBookingDto.Id} not found.");
 
 
             return updatedTicketBookingEntity == null ? null : _mapper.Map<TicketBookingDto>(updatedTicketBookingEntity);
