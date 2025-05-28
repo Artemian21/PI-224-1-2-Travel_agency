@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using Travel_agency.BLL.Abstractions;
 using Travel_agency.Core.Models;
 using Travel_agency.Core.Models.Tours;
@@ -29,20 +30,22 @@ namespace Travel_agency.PL.Controllers
         {
             var allBookings = await _tourBookingService.GetAllTourBookingsAsync();
 
-            if (User.IsInRole("Admin"))
+            var currentUserRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+            var currentUserId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(currentUserRole) || string.IsNullOrEmpty(currentUserId))
+            {
+                return Unauthorized("User role or ID not found in claims.");
+            }
+
+            if (currentUserRole == "Administrator" || currentUserRole == "Manager")
             {
                 return Ok(_mapper.Map<List<TourBookingResponse>>(allBookings));
             }
-            else
-            {
-                var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
-                if (userIdClaim == null)
-                    return Unauthorized();
 
-                var userId = Guid.Parse(userIdClaim.Value);
-                var userBookings = allBookings.Where(b => b.UserId == userId).ToList();
-                return Ok(_mapper.Map<List<TourBookingResponse>>(userBookings));
-            }
+            var userId = Guid.Parse(currentUserId);
+            var userBookings = allBookings.Where(b => b.UserId == userId).ToList();
+            return Ok(_mapper.Map<List<TourBookingResponse>>(userBookings));
         }
 
         [HttpGet("{id}")]
@@ -76,7 +79,7 @@ namespace Travel_agency.PL.Controllers
             tourBookingDto.UserId = userId;
 
             var createdBooking = await _tourBookingService.AddTourBookingAsync(tourBookingDto);
-            return Ok(_mapper.Map<TourBookingResponse>(_mapper));
+            return Ok(_mapper.Map<TourBookingResponse>(createdBooking));
         }
 
         [HttpPut("{id}")]

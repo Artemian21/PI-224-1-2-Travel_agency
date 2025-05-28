@@ -54,7 +54,6 @@ namespace Travel_agency.DataAccess.Repository
 
             existingUser.Username = updatedUser.Username;
             existingUser.Email = updatedUser.Email;
-            existingUser.PasswordHash = updatedUser.PasswordHash;
             existingUser.Role = updatedUser.Role;
 
             await _context.SaveChangesAsync();

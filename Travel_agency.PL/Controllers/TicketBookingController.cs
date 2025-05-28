@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using Travel_agency.BLL.Abstractions;
 using Travel_agency.BLL.Services;
 using Travel_agency.Core.Models;
@@ -30,20 +31,22 @@ namespace Travel_agency.PL.Controllers
         {
             var allBookings = await _ticketBookingService.GetAllTicketBookingsAsync();
 
-            if (User.IsInRole("Admin"))
+            var currentUserRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+            var currentUserId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(currentUserRole) || string.IsNullOrEmpty(currentUserId))
+            {
+                return Unauthorized("User role or ID not found in claims.");
+            }
+
+            if (currentUserRole == "Administrator" || currentUserRole == "Manager")
             {
                 return Ok(_mapper.Map<List<TicketBookingResponse>>(allBookings));
             }
-            else
-            {
-                var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
-                if (userIdClaim == null)
-                    return Unauthorized();
 
-                var userId = Guid.Parse(userIdClaim.Value);
-                var userBookings = allBookings.Where(b => b.UserId == userId).ToList();
-                return Ok(_mapper.Map<List<TicketBookingResponse>>(userBookings));
-            }
+            var userId = Guid.Parse(currentUserId);
+            var userBookings = allBookings.Where(b => b.UserId == userId).ToList();
+            return Ok(_mapper.Map<List<TicketBookingResponse>>(userBookings));
         }
 
         [HttpGet("{id}")]
@@ -110,7 +113,7 @@ namespace Travel_agency.PL.Controllers
             {
                 return NotFound();
             }
-            return Ok(_mapper.Map<HotelRoomResponse>(updatedBooking));
+            return Ok(_mapper.Map<TicketBookingResponse>(updatedBooking));
         }
 
         [HttpDelete("{id}")]

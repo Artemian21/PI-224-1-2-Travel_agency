@@ -87,7 +87,7 @@ namespace Travel_agency.BLL.Services
             ValidateUserDto(updateDto);
 
             var userEntity = await _unitOfWork.Users.GetUserByIdAsync(updateDto.Id);
-            var updatedUserEntity = await _unitOfWork.Users.UpdateUserAsync(userEntity);
+            var updatedUserEntity = await _unitOfWork.Users.UpdateUserAsync(_mapper.Map<UserEntity>(updateDto));
             if (updatedUserEntity == null)
             {
                 throw new NotFoundException($"User with ID {updateDto.Id} not found.");

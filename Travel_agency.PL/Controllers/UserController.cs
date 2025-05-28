@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using Travel_agency.BLL.Abstractions;
 using Travel_agency.Core.Enums;
 using Travel_agency.Core.Models;
@@ -67,8 +68,8 @@ namespace Travel_agency.PL.Controllers
                 return BadRequest("User data is null.");
             }
 
-            var currentUserRole = User.Claims.FirstOrDefault(c => c.Type == "role")?.Value;
-            var currentUserId = User.Claims.FirstOrDefault(c => c.Type == "nameidentifier")?.Value;
+            var currentUserRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+            var currentUserId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
 
             if (currentUserRole != "Administrator" && currentUserRole != "Manager" && currentUserId != id.ToString())
             {
