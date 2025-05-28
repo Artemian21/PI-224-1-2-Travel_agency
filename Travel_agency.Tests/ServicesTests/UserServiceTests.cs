@@ -174,6 +174,7 @@ public class UserServiceTests
         var updatedDto = _fixture.Create<UserDto>();
 
         _unitOfWork.Users.GetUserByIdAsync(dto.Id).Returns(entity);
+        _mapper.Map<UserEntity>(dto).Returns(entity);
         _unitOfWork.Users.UpdateUserAsync(entity).Returns(updatedEntity);
         _mapper.Map<UserDto>(updatedEntity).Returns(updatedDto);
 
