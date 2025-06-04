@@ -6,7 +6,7 @@ using NSubstitute;
 using Travel_agency.BLL.Services;
 using Travel_agency.Core.Enums;
 using Travel_agency.Core.Exceptions;
-using Travel_agency.Core.Models.Hotels;
+using Travel_agency.Core.BusinessModels.Hotels;
 using Travel_agency.DataAccess.Abstraction;
 using Travel_agency.DataAccess.Entities;
 
@@ -37,14 +37,14 @@ public class HotelRoomServiceTests
     public async Task GetAllHotelRoomsAsync_ReturnsMappedRooms()
     {
         var rooms = _fixture.CreateMany<HotelRoomEntity>(3);
-        var dto = _fixture.CreateMany<HotelRoomDto>(3);
+        var model = _fixture.CreateMany<HotelRoomModel>(3);
 
         _unitOfWork.HotelRooms.GetAllHotelRoomsAsync().Returns(Task.FromResult(rooms));
-        _mapper.Map<IEnumerable<HotelRoomDto>>(rooms).Returns(dto);
+        _mapper.Map<IEnumerable<HotelRoomModel>>(rooms).Returns(model);
 
         var result = await _service.GetAllHotelRoomsAsync();
 
-        Assert.Equal(dto, result);
+        Assert.Equal(model, result);
     }
 
     [Fact]
@@ -52,14 +52,14 @@ public class HotelRoomServiceTests
     {
         var id = Guid.NewGuid();
         var entity = _fixture.Create<HotelRoomEntity>();
-        var dto = _fixture.Create<HotelRoomWithBookingDto>();
+        var model = _fixture.Create<HotelRoomWithBookingModel>();
 
         _unitOfWork.HotelRooms.GetHotelRoomByIdAsync(id).Returns(Task.FromResult(entity));
-        _mapper.Map<HotelRoomWithBookingDto>(entity).Returns(dto);
+        _mapper.Map<HotelRoomWithBookingModel>(entity).Returns(model);
 
         var result = await _service.GetHotelRoomByIdAsync(id);
 
-        Assert.Equal(dto, result);
+        Assert.Equal(model, result);
     }
 
     [Fact]
@@ -77,15 +77,15 @@ public class HotelRoomServiceTests
         var id = Guid.NewGuid();
         var hotel = _fixture.Create<HotelEntity>();
         var rooms = _fixture.CreateMany<HotelRoomEntity>(3);
-        var dto = _fixture.CreateMany<HotelRoomDto>(3);
+        var model = _fixture.CreateMany<HotelRoomModel>(3);
 
         _unitOfWork.Hotels.GetHotelByIdAsync(id).Returns(Task.FromResult(hotel));
         _unitOfWork.HotelRooms.GetRoomsByHotelIdAsync(id).Returns(Task.FromResult(rooms));
-        _mapper.Map<IEnumerable<HotelRoomDto>>(rooms).Returns(dto);
+        _mapper.Map<IEnumerable<HotelRoomModel>>(rooms).Returns(model);
 
         var result = await _service.GetHotelRoomsByHotelIdAsync(id);
 
-        Assert.Equal(dto, result);
+        Assert.Equal(model, result);
     }
 
     [Fact]
@@ -100,31 +100,31 @@ public class HotelRoomServiceTests
     [Fact]
     public async Task AddHotelRoomAsync_ReturnsMappedResult()
     {
-        var dto = _fixture.Create<HotelRoomDto>();
+        var model = _fixture.Create<HotelRoomModel>();
         var entity = _fixture.Create<HotelRoomEntity>();
         var addedEntity = _fixture.Create<HotelRoomEntity>();
-        var resultDto = _fixture.Create<HotelRoomDto>();
+        var resultModel = _fixture.Create<HotelRoomModel>();
 
-        _mapper.Map<HotelRoomEntity>(dto).Returns(entity);
+        _mapper.Map<HotelRoomEntity>(model).Returns(entity);
         _unitOfWork.HotelRooms.AddHotelRoomAsync(entity).Returns(addedEntity);
-        _mapper.Map<HotelRoomDto>(addedEntity).Returns(resultDto);
+        _mapper.Map<HotelRoomModel>(addedEntity).Returns(resultModel);
 
-        var result = await _service.AddHotelRoomAsync(dto);
+        var result = await _service.AddHotelRoomAsync(model);
 
-        Assert.Equal(resultDto, result);
+        Assert.Equal(resultModel, result);
     }
 
 [Theory]
     [InlineData(null)]
-    public async Task AddHotelRoomAsync_ThrowsIfDtoInvalid(HotelRoomDto? dto)
+    public async Task AddHotelRoomAsync_ThrowsIfModelInvalid(HotelRoomModel? model)
     {
-        await Assert.ThrowsAsync<ArgumentNullException>(() => _service.AddHotelRoomAsync(dto!));
+        await Assert.ThrowsAsync<ArgumentNullException>(() => _service.AddHotelRoomAsync(model!));
     }
 
     [Fact]
     public async Task AddHotelRoomAsync_ThrowsIfInvalidValues()
     {
-        var dto = new HotelRoomDto
+        var model = new HotelRoomModel
         {
             Capacity = 0,
             PricePerNight = -1,
@@ -132,36 +132,36 @@ public class HotelRoomServiceTests
             RoomType = (RoomType)999
         };
 
-        await Assert.ThrowsAsync<BusinessValidationException>(() => _service.AddHotelRoomAsync(dto));
+        await Assert.ThrowsAsync<BusinessValidationException>(() => _service.AddHotelRoomAsync(model));
     }
 
     [Fact]
     public async Task UpdateHotelRoomAsync_ReturnsMappedResult()
     {
-        var dto = _fixture.Create<HotelRoomDto>();
+        var model = _fixture.Create<HotelRoomModel>();
         var entity = _fixture.Create<HotelRoomEntity>();
         var updated = _fixture.Create<HotelRoomEntity>();
-        var resultDto = _fixture.Create<HotelRoomDto>();
+        var resultModel = _fixture.Create<HotelRoomModel>();
 
-        _mapper.Map<HotelRoomEntity>(dto).Returns(entity);
+        _mapper.Map<HotelRoomEntity>(model).Returns(entity);
         _unitOfWork.HotelRooms.UpdateHotelRoomAsync(entity).Returns(updated);
-        _mapper.Map<HotelRoomDto>(updated).Returns(resultDto);
+        _mapper.Map<HotelRoomModel>(updated).Returns(resultModel);
 
-        var result = await _service.UpdateHotelRoomAsync(dto);
+        var result = await _service.UpdateHotelRoomAsync(model);
 
-        Assert.Equal(resultDto, result);
+        Assert.Equal(resultModel, result);
     }
 
     [Fact]
     public async Task UpdateHotelRoomAsync_ThrowsIfNotFound()
     {
-        var dto = _fixture.Create<HotelRoomDto>();
+        var model = _fixture.Create<HotelRoomModel>();
         var entity = _fixture.Create<HotelRoomEntity>();
 
-        _mapper.Map<HotelRoomEntity>(dto).Returns(entity);
+        _mapper.Map<HotelRoomEntity>(model).Returns(entity);
         _unitOfWork.HotelRooms.UpdateHotelRoomAsync(entity).Returns((HotelRoomEntity?)null);
 
-        await Assert.ThrowsAsync<NotFoundException>(() => _service.UpdateHotelRoomAsync(dto));
+        await Assert.ThrowsAsync<NotFoundException>(() => _service.UpdateHotelRoomAsync(model));
     }
 
     [Fact]

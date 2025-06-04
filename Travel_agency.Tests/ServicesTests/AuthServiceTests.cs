@@ -7,15 +7,16 @@ using AutoMapper;
 using NSubstitute;
 using Travel_agency.BLL.Services;
 using Travel_agency.Core.Exceptions;
-using Travel_agency.Core.Models.Users;
+using Travel_agency.Core.BusinessModels.Users;
 using Travel_agency.DataAccess.Entities;
+using Travel_agency.DataAccess;
 
 namespace Travel_agency.Tests.ServicesTests;
 
 public class AuthServiceTests
 {
     private readonly IFixture _fixture;
-    private readonly IUserRepository _userRepository;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly IPasswordHasher _passwordHasher;
     private readonly IJWTProvider _jwtProvider;
     private readonly IMapper _mapper;
@@ -29,12 +30,12 @@ public class AuthServiceTests
             .ToList()
             .ForEach(b => _fixture.Behaviors.Remove(b));
         _fixture.Behaviors.Add(new OmitOnRecursionBehavior());
-        _userRepository = _fixture.Freeze<IUserRepository>();
+        _unitOfWork = _fixture.Freeze<IUnitOfWork>();
         _passwordHasher = _fixture.Freeze<IPasswordHasher>();
         _jwtProvider = _fixture.Freeze<IJWTProvider>();
         _mapper = _fixture.Freeze<IMapper>();
 
-        _authService = new AuthService(_userRepository, _passwordHasher, _jwtProvider, _mapper);
+        _authService = new AuthService(_unitOfWork, _passwordHasher, _jwtProvider, _mapper);
     }
 
     [Fact]
@@ -48,50 +49,50 @@ public class AuthServiceTests
     public async Task Register_ThrowsConflictException_WhenEmailAlreadyExists()
     {
         // Arrange
-        var dto = _fixture.Create<RegisterUserDto>();
-        _userRepository.GetUserByEmailAsync(dto.Email).Returns(new UserEntity());
+        var model = _fixture.Create<RegisterUserModel>();
+        _unitOfWork.Users.GetUserByEmailAsync(model.Email).Returns(new UserEntity());
 
         // Act & Assert
-        await Assert.ThrowsAsync<ConflictException>(() => _authService.Register(dto));
+        await Assert.ThrowsAsync<ConflictException>(() => _authService.Register(model));
     }
 
     [Fact]
     public async Task Register_ThrowsValidationException_WhenPasswordIsWeak()
     {
         // Arrange
-        var dto = _fixture.Build<RegisterUserDto>()
+        var model = _fixture.Build<RegisterUserModel>()
                           .With(x => x.Password, "weak")
                           .Create();
-        _userRepository.GetUserByEmailAsync(dto.Email).Returns((UserEntity)null);
+        _unitOfWork.Users.GetUserByEmailAsync(model.Email).Returns((UserEntity)null);
 
         // Act & Assert
-        await Assert.ThrowsAsync<ValidationException>(() => _authService.Register(dto));
+        await Assert.ThrowsAsync<ValidationException>(() => _authService.Register(model));
     }
 
     [Fact]
-    public async Task Register_ReturnsUserDto_WhenSuccessful()
+    public async Task Register_ReturnsUserModel_WhenSuccessful()
     {
         // Arrange
-        var dto = _fixture.Build<RegisterUserDto>()
+        var model = _fixture.Build<RegisterUserModel>()
                           .With(x => x.Password, "StrongPass1!")
                           .Create();
-        _userRepository.GetUserByEmailAsync(dto.Email).Returns((UserEntity)null);
+        _unitOfWork.Users.GetUserByEmailAsync(model.Email).Returns((UserEntity)null);
 
         var userEntity = _fixture.Build<UserEntity>()
-                                 .With(x => x.Email, dto.Email)
-                                 .With(x => x.Username, dto.Username)
+                                 .With(x => x.Email, model.Email)
+                                 .With(x => x.Username, model.Username)
                                  .Create();
 
-        _passwordHasher.GenerateHash(dto.Password).Returns("hashedPassword");
-        _userRepository.AddUserAsync(Arg.Any<UserEntity>()).Returns(userEntity);
-        var userDto = _fixture.Create<UserDto>();
-        _mapper.Map<UserDto>(userEntity).Returns(userDto);
+        _passwordHasher.GenerateHash(model.Password).Returns("hashedPassword");
+        _unitOfWork.Users.AddUserAsync(Arg.Any<UserEntity>()).Returns(userEntity);
+        var userModel = _fixture.Create<UserModel>();
+        _mapper.Map<UserModel>(userEntity).Returns(userModel);
 
         // Act
-        var result = await _authService.Register(dto);
+        var result = await _authService.Register(model);
 
         // Assert
-        Assert.Equal(userDto, result);
+        Assert.Equal(userModel, result);
     }
 
     [Fact]
@@ -107,7 +108,7 @@ public class AuthServiceTests
     public async Task Login_ThrowsNotFoundException_WhenUserNotFound()
     {
         // Arrange
-        _userRepository.GetUserByEmailAsync(Arg.Any<string>()).Returns((UserEntity)null);
+        _unitOfWork.Users.GetUserByEmailAsync(Arg.Any<string>()).Returns((UserEntity)null);
 
         // Act & Assert
         await Assert.ThrowsAsync<NotFoundException>(() => _authService.Login("test@example.com", "Password1!"));
@@ -118,7 +119,7 @@ public class AuthServiceTests
     {
         // Arrange
         var user = _fixture.Create<UserEntity>();
-        _userRepository.GetUserByEmailAsync(user.Email).Returns(user);
+        _unitOfWork.Users.GetUserByEmailAsync(user.Email).Returns(user);
         _passwordHasher.VerifyHash(Arg.Any<string>(), Arg.Any<string>()).Returns(false);
         
 // Act & Assert
@@ -130,13 +131,13 @@ public class AuthServiceTests
     {
         // Arrange
         var user = _fixture.Create<UserEntity>();
-        var userDto = _fixture.Create<UserDto>();
+        var userModel = _fixture.Create<UserModel>();
         var token = _fixture.Create<string>();
 
-        _userRepository.GetUserByEmailAsync(user.Email).Returns(user);
+        _unitOfWork.Users.GetUserByEmailAsync(user.Email).Returns(user);
         _passwordHasher.VerifyHash(Arg.Any<string>(), Arg.Any<string>()).Returns(true);
-        _mapper.Map<UserDto>(user).Returns(userDto);
-        _jwtProvider.GenerateToken(userDto).Returns(token);
+        _mapper.Map<UserModel>(user).Returns(userModel);
+        _jwtProvider.GenerateToken(userModel).Returns(token);
 
         // Act
         var result = await _authService.Login(user.Email, "ValidPass1!");

@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Travel_agency.Core.Models.Users
+namespace Travel_agency.Core.BusinessModels.Users
 {
-    public class RegisterUserDto
+    public class RegisterUserModel
     {
         public string Username { get; set; } = string.Empty;
         [EmailAddress]

@@ -5,7 +5,7 @@ using AutoFixture;
 using Microsoft.Extensions.Configuration;
 using Travel_agency.BLL.Auth;
 using Travel_agency.Core.Enums;
-using Travel_agency.Core.Models.Users;
+using Travel_agency.Core.BusinessModels.Users;
 
 namespace Travel_agency.Tests.AuthTests;
 
@@ -36,7 +36,7 @@ public class JWTProviderTests
     public void GenerateToken_ValidUser_ReturnsValidJwt()
     {
         // Arrange
-        var user = _fixture.Build<UserDto>()
+        var user = _fixture.Build<UserModel>()
             .With(u => u.Role, UserRole.Administrator)
             .With(u => u.Email, "test@example.com")
             .With(u => u.Username, "TestUser")
@@ -85,7 +85,7 @@ public class JWTProviderTests
             .AddInMemoryCollection(configDict)
             .Build();
 
-        var user = _fixture.Build<UserDto>()
+        var user = _fixture.Build<UserModel>()
             .With(u => u.Role, UserRole.Administrator)
             .Create();
 
@@ -113,7 +113,7 @@ public class JWTProviderTests
             .AddInMemoryCollection(configDict)
             .Build();
 
-        var user = _fixture.Build<UserDto>().Create();
+        var user = _fixture.Build<UserModel>().Create();
         var jwtProvider = new JWTProvider(configuration);
 
         // Act + Assert

@@ -1,13 +1,13 @@
-﻿using Travel_agency.Core.Models.Tours;
+﻿using Travel_agency.Core.BusinessModels.Tours;
 
 namespace Travel_agency.BLL.Abstractions
 {
     public interface ITourBookingService
     {
-        Task<TourBookingDto> AddTourBookingAsync(TourBookingDto tourBookingDto);
+        Task<TourBookingModel> AddTourBookingAsync(TourBookingModel tourBookingModel);
         Task<bool> DeleteTourBookingAsync(Guid tourBookingId);
-        Task<IEnumerable<TourBookingDto>> GetAllTourBookingsAsync();
-        Task<TourBookingDetailsDto?> GetTourBookingByIdAsync(Guid tourBookingId);
-        Task<TourBookingDto?> UpdateTourBookingAsync(TourBookingDto tourBookingDto);
+        Task<IEnumerable<TourBookingModel>> GetAllTourBookingsAsync();
+        Task<TourBookingDetailsModel?> GetTourBookingByIdAsync(Guid tourBookingId);
+        Task<TourBookingModel?> UpdateTourBookingAsync(TourBookingModel tourBookingModel);
     }
 }

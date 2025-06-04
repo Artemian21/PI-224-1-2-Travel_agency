@@ -1,6 +1,6 @@
 ﻿using Travel_agency.Core.Enums;
-using Travel_agency.Core.Models.Tours;
-using Travel_agency.Core.Models.Users;
+using Travel_agency.Core.BusinessModels.Tours;
+using Travel_agency.Core.BusinessModels.Users;
 
 namespace Travel_agency.PL.Models.Responses
 {
@@ -10,6 +10,6 @@ namespace Travel_agency.PL.Models.Responses
         Guid UserId,
         DateTime BookingDate,
         Status Status,
-        TourDto Tour,
-        UserDto User);
+        TourModel Tour,
+        UserModel User);
 }

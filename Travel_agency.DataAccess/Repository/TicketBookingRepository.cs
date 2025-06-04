@@ -35,7 +35,6 @@ namespace Travel_agency.DataAccess.Repository
         public async Task<TicketBookingEntity> AddTicketBookingAsync(TicketBookingEntity ticketBooking)
         {
             await _context.TicketBookings.AddAsync(ticketBooking);
-            await _context.SaveChangesAsync();
             return ticketBooking;
         }
 
@@ -52,8 +51,6 @@ namespace Travel_agency.DataAccess.Repository
             existingTicketBooking.Status = updatedTicketBooking.Status;
             existingTicketBooking.BookingDate = updatedTicketBooking.BookingDate;
 
-            await _context.SaveChangesAsync();
-
             return existingTicketBooking;
         }
 
@@ -63,7 +60,6 @@ namespace Travel_agency.DataAccess.Repository
             if (ticketBooking != null)
             {
                 _context.TicketBookings.Remove(ticketBooking);
-                await _context.SaveChangesAsync();
             }
         }
     }

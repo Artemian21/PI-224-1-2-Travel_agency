@@ -9,7 +9,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using Travel_agency.BLL.Abstractions;
-using Travel_agency.Core.Models.Users;
+using Travel_agency.Core.BusinessModels.Users;
 
 namespace Travel_agency.BLL.Auth
 {
@@ -21,14 +21,14 @@ namespace Travel_agency.BLL.Auth
         {
             _configuration = configuration;
         }
-        public string GenerateToken(UserDto userDto)
+        public string GenerateToken(UserModel userModel)
         {
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.NameIdentifier, userDto.Id.ToString()),
-                new Claim(ClaimTypes.Name, userDto.Username),
-                new Claim(ClaimTypes.Email, userDto.Email),
-                new Claim(ClaimTypes.Role, userDto.Role.ToString())
+                new Claim(ClaimTypes.NameIdentifier, userModel.Id.ToString()),
+                new Claim(ClaimTypes.Name, userModel.Username),
+                new Claim(ClaimTypes.Email, userModel.Email),
+                new Claim(ClaimTypes.Role, userModel.Role.ToString())
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Key"]));

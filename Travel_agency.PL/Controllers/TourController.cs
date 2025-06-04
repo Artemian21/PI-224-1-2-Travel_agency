@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Travel_agency.BLL.Abstractions;
-using Travel_agency.Core.Models.Tours;
+using Travel_agency.Core.BusinessModels.Tours;
 using Travel_agency.PL.Models.Requests;
 using Travel_agency.PL.Models.Responses;
 
@@ -59,9 +59,9 @@ namespace Travel_agency.PL.Controllers
                 return BadRequest("Tour data is null.");
             }
 
-            var tourDto = _mapper.Map<TourDto>(tour);
+            var tourModel = _mapper.Map<TourModel>(tour);
 
-            var createdTour = await _tourService.AddTourAsync(tourDto);
+            var createdTour = await _tourService.AddTourAsync(tourModel);
             return Ok(_mapper.Map<TourResponse>(createdTour));
         }
 
@@ -74,10 +74,10 @@ namespace Travel_agency.PL.Controllers
                 return BadRequest("Tour data is null.");
             }
 
-            var tourDto = _mapper.Map<TourDto>(tour);
-            tourDto.Id = id;
+            var tourModel = _mapper.Map<TourModel>(tour);
+            tourModel.Id = id;
 
-            var updatedTour = await _tourService.UpdateTourAsync(tourDto);
+            var updatedTour = await _tourService.UpdateTourAsync(tourModel);
             if (updatedTour == null)
             {
                 return NotFound();

@@ -1,8 +1,8 @@
 ﻿using Travel_agency.Core.Enums;
 
-namespace Travel_agency.Core.Models.Tours;
+namespace Travel_agency.Core.BusinessModels.Tours;
 
-public class TourFilterDto
+public class TourFilterModel
 {
     public string? Country { get; set; }
     public TypeTour? Type { get; set; }

@@ -1,8 +1,8 @@
 ﻿using Travel_agency.Core.Enums;
 
-namespace Travel_agency.Core.Models.Hotels;
+namespace Travel_agency.Core.BusinessModels.Hotels;
 
-public class HotelBookingDto
+public class HotelBookingModel
 {
     public Guid Id { get; set; } = Guid.NewGuid();
     public Guid HotelRoomId { get; set; }

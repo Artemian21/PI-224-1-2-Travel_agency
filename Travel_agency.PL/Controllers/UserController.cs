@@ -5,8 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Travel_agency.BLL.Abstractions;
 using Travel_agency.Core.Enums;
-using Travel_agency.Core.Models;
-using Travel_agency.Core.Models.Users;
+using Travel_agency.Core.BusinessModels;
+using Travel_agency.Core.BusinessModels.Users;
 using Travel_agency.PL.Models.Requests;
 using Travel_agency.PL.Models.Responses;
 

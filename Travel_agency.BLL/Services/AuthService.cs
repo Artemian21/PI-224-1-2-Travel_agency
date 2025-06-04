@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using Travel_agency.BLL.Abstractions;
 using Travel_agency.Core.Enums;
 using Travel_agency.Core.Exceptions;
-using Travel_agency.Core.Models.Users;
+using Travel_agency.Core.BusinessModels.Users;
 using Travel_agency.DataAccess.Abstraction;
 using Travel_agency.DataAccess.Entities;
 
@@ -17,44 +17,45 @@ namespace Travel_agency.BLL.Services
 {
     public class AuthService : IAuthService
     {
-        private readonly IUserRepository _userRepository;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IPasswordHasher _passwordHasher;
         private readonly IJWTProvider _jwtProvider;
         private readonly IMapper _mapper;
 
-        public AuthService(IUserRepository userRepository, IPasswordHasher passwordHasher, IJWTProvider jwtProvider, IMapper mapper)
+        public AuthService(IUnitOfWork unitOfWork, IPasswordHasher passwordHasher, IJWTProvider jwtProvider, IMapper mapper)
         {
-            _userRepository = userRepository;
+            _unitOfWork = unitOfWork;
             _passwordHasher = passwordHasher;
             _jwtProvider = jwtProvider;
             _mapper = mapper;
         }
 
-        public async Task<UserDto> Register(RegisterUserDto registerDto)
+        public async Task<UserModel> Register(RegisterUserModel register)
         {
-            if (registerDto == null)
-                throw new ArgumentNullException(nameof(registerDto), "Register data cannot be null");
+            if (register == null)
+                throw new ArgumentNullException(nameof(register), "Register data cannot be null");
 
-            var existingByEmail = await _userRepository.GetUserByEmailAsync(registerDto.Email);
+            var existingByEmail = await _unitOfWork.Users.GetUserByEmailAsync(register.Email);
             if (existingByEmail != null)
                 throw new ConflictException("Email is already in use");
 
-            if (!IsPasswordStrong(registerDto.Password))
+            if (!IsPasswordStrong(register.Password))
                 throw new ValidationException("Password must be at least 8 characters long and include uppercase, lowercase, digit, and special character");
 
-            var passwordHash = _passwordHasher.GenerateHash(registerDto.Password);
+            var passwordHash = _passwordHasher.GenerateHash(register.Password);
 
             var userEntity = new UserEntity
             {
                 Id = Guid.NewGuid(),
-                Username = registerDto.Username,
-                Email = registerDto.Email,
+                Username = register.Username,
+                Email = register.Email,
                 PasswordHash = passwordHash,
                 Role = UserRole.Registered
             };
 
-            var addedUser = await _userRepository.AddUserAsync(userEntity);
-            return _mapper.Map<UserDto>(addedUser);
+            var addedUser = await _unitOfWork.Users.AddUserAsync(userEntity);
+            await _unitOfWork.SaveChangesAsync();
+            return _mapper.Map<UserModel>(addedUser);
         }
 
         public async Task<string> Login(string email, string password)
@@ -62,15 +63,16 @@ namespace Travel_agency.BLL.Services
             if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
                 throw new BusinessValidationException("Email and password must not be empty");
 
-            var userEntity = await _userRepository.GetUserByEmailAsync(email);
+            var userEntity = await _unitOfWork.Users.GetUserByEmailAsync(email);
+
             if (userEntity == null)
                 throw new NotFoundException("User not found");
 
             if (!_passwordHasher.VerifyHash(password, userEntity.PasswordHash))
                 throw new UnauthorizedAccessException("Invalid password");
 
-            var userDto = _mapper.Map<UserDto>(userEntity);
-            return _jwtProvider.GenerateToken(userDto);
+            var userModel = _mapper.Map<UserModel>(userEntity);
+            return _jwtProvider.GenerateToken(userModel);
         }
 
         private bool IsPasswordStrong(string password)

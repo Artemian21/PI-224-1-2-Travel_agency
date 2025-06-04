@@ -34,7 +34,6 @@ namespace Travel_agency.DataAccess.Repository
         public async Task<TourBookingEntity> AddTourBookingAsync(TourBookingEntity tourBooking)
         {
             _context.TourBookings.Add(tourBooking);
-            await _context.SaveChangesAsync();
             return tourBooking;
         }
 
@@ -51,8 +50,6 @@ namespace Travel_agency.DataAccess.Repository
             existingTourBooking.Status = updatedTourBooking.Status;
             existingTourBooking.BookingDate = updatedTourBooking.BookingDate;
 
-            await _context.SaveChangesAsync();
-
             return existingTourBooking;
         }
 
@@ -62,7 +59,6 @@ namespace Travel_agency.DataAccess.Repository
             if (tourBooking != null)
             {
                 _context.TourBookings.Remove(tourBooking);
-                await _context.SaveChangesAsync();
             }
         }
 

@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
-using Travel_agency.Core.Models.Hotels;
-using Travel_agency.Core.Models.Tours;
-using Travel_agency.Core.Models.Transports;
-using Travel_agency.Core.Models.Users;
+using Travel_agency.Core.BusinessModels.Hotels;
+using Travel_agency.Core.BusinessModels.Tours;
+using Travel_agency.Core.BusinessModels.Transports;
+using Travel_agency.Core.BusinessModels.Users;
 using Travel_agency.PL.Models.Requests;
 using Travel_agency.PL.Models.Responses;
 
@@ -12,34 +12,34 @@ namespace Travel_agency.PL
     {
         public PLMappingProfile()
         {
-            CreateMap<UserRequest, UserDto>();
-            CreateMap<UserDto, UserResponse>();
+            CreateMap<UserRequest, UserModel>();
+            CreateMap<UserModel, UserResponse>();
 
-            CreateMap<RegisterUserRequest,  RegisterUserDto>();
+            CreateMap<RegisterUserRequest,  RegisterUserModel>();
 
-            CreateMap<TransportRequest, TransportDto>();
-            CreateMap<TransportDto, TransportResponse>();
+            CreateMap<TransportRequest, TransportModel>();
+            CreateMap<TransportModel, TransportResponse>();
 
-            CreateMap<TourRequest, TourDto>();
-            CreateMap<TourDto, TourResponse>();
-            CreateMap<TourFilterRequest , TourFilterDto>();
+            CreateMap<TourRequest, TourModel>();
+            CreateMap<TourModel, TourResponse>();
+            CreateMap<TourFilterRequest , TourFilterModel>();
 
-            CreateMap<TourBookingRequest, TourBookingDto>();
-            CreateMap<TourBookingDto, TourBookingResponse>();
-            CreateMap<TourBookingDetailsDto, TourBookingDetailsResponse>();
+            CreateMap<TourBookingRequest, TourBookingModel>();
+            CreateMap<TourBookingModel, TourBookingResponse>();
+            CreateMap<TourBookingDetailsModel, TourBookingDetailsResponse>();
 
-            CreateMap<TicketBookingRequest, TicketBookingDto>();
-            CreateMap<TicketBookingDto, TicketBookingResponse>();
+            CreateMap<TicketBookingRequest, TicketBookingModel>();
+            CreateMap<TicketBookingModel, TicketBookingResponse>();
 
-            CreateMap<HotelRoomRequest, HotelRoomDto>();
-            CreateMap<HotelRoomDto, HotelRoomResponse>();
+            CreateMap<HotelRoomRequest, HotelRoomModel>();
+            CreateMap<HotelRoomModel, HotelRoomResponse>();
 
-            CreateMap<HotelRequest, HotelDto>();
-            CreateMap<HotelDto, HotelResponse>();
+            CreateMap<HotelRequest, HotelModel>();
+            CreateMap<HotelModel, HotelResponse>();
 
-            CreateMap<HotelBookingRequest, HotelBookingDto>();
-            CreateMap<HotelBookingDto, HotelBookingResponse>();
-            CreateMap<HotelBookingDetailsDto, HotelBookingDetailsResponse>();
+            CreateMap<HotelBookingRequest, HotelBookingModel>();
+            CreateMap<HotelBookingModel, HotelBookingResponse>();
+            CreateMap<HotelBookingDetailsModel, HotelBookingDetailsResponse>();
 
         }
     }

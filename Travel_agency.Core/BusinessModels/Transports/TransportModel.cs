@@ -1,6 +1,6 @@
-﻿namespace Travel_agency.Core.Models.Transports;
+﻿namespace Travel_agency.Core.BusinessModels.Transports;
 
-public class TransportDto
+public class TransportModel
 {
     public Guid Id { get; set; } = Guid.NewGuid();
     public string Type { get; set; } = string.Empty;

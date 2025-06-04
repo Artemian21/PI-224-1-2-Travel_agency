@@ -5,7 +5,7 @@ using NSubstitute;
 using Travel_agency.BLL.Services;
 using Travel_agency.Core.Enums;
 using Travel_agency.Core.Exceptions;
-using Travel_agency.Core.Models.Hotels;
+using Travel_agency.Core.BusinessModels.Hotels;
 using Travel_agency.DataAccess.Abstraction;
 using Travel_agency.DataAccess.Entities;
 
@@ -32,30 +32,30 @@ namespace Travel_agency.Tests.ServicesTests;
         }
 
         [Fact]
-        public async Task GetAllHotelBookingsAsync_ReturnsMappedDtos()
+        public async Task GetAllHotelBookingsAsync_ReturnsMappedModels()
         {
             var entities = _fixture.CreateMany<HotelBookingEntity>(3).ToList();
-            var dtos = _fixture.CreateMany<HotelBookingDto>(3);
+            var model = _fixture.CreateMany<HotelBookingModel>(3);
             _unitOfWork.HotelBookings.GetAllHotelBookingsAsync().Returns(entities);
-            _mapper.Map<IEnumerable<HotelBookingDto>>(entities).Returns(dtos);
+            _mapper.Map<IEnumerable<HotelBookingModel>>(entities).Returns(model);
 
             var result = await _service.GetAllHotelBookingsAsync();
 
-            Assert.Equal(dtos, result);
+            Assert.Equal(model, result);
         }
 
         [Fact]
-        public async Task GetHotelBookingByIdAsync_ExistingId_ReturnsDetailsDto()
+        public async Task GetHotelBookingByIdAsync_ExistingId_ReturnsDetailsModel()
         {
             var id = Guid.NewGuid();
             var entity = _fixture.Create<HotelBookingEntity>();
-            var dto = _fixture.Create<HotelBookingDetailsDto>();
+            var model = _fixture.Create<HotelBookingDetailsModel>();
             _unitOfWork.HotelBookings.GetHotelBookingByIdAsync(id).Returns(entity);
-            _mapper.Map<HotelBookingDetailsDto>(entity).Returns(dto);
+            _mapper.Map<HotelBookingDetailsModel>(entity).Returns(model);
 
             var result = await _service.GetHotelBookingByIdAsync(id);
 
-            Assert.Equal(dto, result);
+            Assert.Equal(model, result);
         }
 
         [Fact]
@@ -68,32 +68,32 @@ namespace Travel_agency.Tests.ServicesTests;
         }
 
         [Fact]
-        public async Task AddHotelBookingAsync_ValidDto_ReturnsMappedDto()
+        public async Task AddHotelBookingAsync_ValidModel_ReturnsMappedModel()
         {
-            var dto = _fixture.Create<HotelBookingDto>();
-            dto.StartDate = DateTime.UtcNow.AddDays(1);
-            dto.EndDate = dto.StartDate.AddDays(2);
-            dto.HotelRoomId = Guid.NewGuid();
-            dto.UserId = Guid.NewGuid();
+            var model = _fixture.Create<HotelBookingModel>();
+            model.StartDate = DateTime.UtcNow.AddDays(1);
+            model.EndDate = model.StartDate.AddDays(2);
+            model.HotelRoomId = Guid.NewGuid();
+            model.UserId = Guid.NewGuid();
 
             var entity = _fixture.Create<HotelBookingEntity>();
             var addedEntity = _fixture.Create<HotelBookingEntity>();
-            var resultDto = _fixture.Create<HotelBookingDto>();
+            var resultModel = _fixture.Create<HotelBookingModel>();
 
-            _mapper.Map<HotelBookingEntity>(dto).Returns(entity);
+            _mapper.Map<HotelBookingEntity>(model).Returns(entity);
             _unitOfWork.HotelBookings.AddHotelBookingAsync(entity).Returns(addedEntity);
-            _mapper.Map<HotelBookingDto>(addedEntity).Returns(resultDto);
+            _mapper.Map<HotelBookingModel>(addedEntity).Returns(resultModel);
 
-            var result = await _service.AddHotelBookingAsync(dto);
+            var result = await _service.AddHotelBookingAsync(model);
 
-            Assert.Equal(resultDto, result);
+            Assert.Equal(resultModel, result);
         }
 
         [Theory]
         [InlineData(null)]
-        public async Task AddHotelBookingAsync_NullDto_ThrowsArgumentNullException(HotelBookingDto dto)
+        public async Task AddHotelBookingAsync_NullModel_ThrowsArgumentNullException(HotelBookingModel model)
         {
-            await Assert.ThrowsAsync<ArgumentNullException>(() => _service.AddHotelBookingAsync(dto));
+            await Assert.ThrowsAsync<ArgumentNullException>(() => _service.AddHotelBookingAsync(model));
         }
         
         [Theory]
@@ -103,9 +103,9 @@ namespace Travel_agency.Tests.ServicesTests;
         [InlineData("EndDate")]
         [InlineData("NumberOfGuests")]
         [InlineData("Status")]
-        public async Task AddHotelBookingAsync_InvalidDto_ThrowsBusinessValidationException(string field)
+        public async Task AddHotelBookingAsync_InvalidModel_ThrowsBusinessValidationException(string field)
         {
-            var dto = _fixture.Build<HotelBookingDto>()
+            var model = _fixture.Build<HotelBookingModel>()
                 .With(x => x.UserId, Guid.NewGuid())
                 .With(x => x.HotelRoomId, Guid.NewGuid())
                 .With(x => x.StartDate, DateTime.UtcNow.AddDays(1))
@@ -116,53 +116,53 @@ namespace Travel_agency.Tests.ServicesTests;
 
             switch (field)
             {
-                case "UserId": dto.UserId = Guid.Empty; break;
-                case "HotelRoomId": dto.HotelRoomId = Guid.Empty; break;
-                case "StartDate": dto.StartDate = DateTime.UtcNow.AddDays(-1); break;
-                case "EndDate": dto.EndDate = dto.StartDate; break;
-                case "NumberOfGuests": dto.NumberOfGuests = 0; break;
-                case "Status": dto.Status = (Status)999; break;
+                case "UserId": model.UserId = Guid.Empty; break;
+                case "HotelRoomId": model.HotelRoomId = Guid.Empty; break;
+                case "StartDate": model.StartDate = DateTime.UtcNow.AddDays(-1); break;
+                case "EndDate": model.EndDate = model.StartDate; break;
+                case "NumberOfGuests": model.NumberOfGuests = 0; break;
+                case "Status": model.Status = (Status)999; break;
             }
 
-            await Assert.ThrowsAsync<BusinessValidationException>(() => _service.AddHotelBookingAsync(dto));
+            await Assert.ThrowsAsync<BusinessValidationException>(() => _service.AddHotelBookingAsync(model));
         }
 
         [Fact]
         public async Task UpdateHotelBookingAsync_NotFound_ThrowsNotFoundException()
         {
-            var dto = _fixture.Create<HotelBookingDto>();
-            dto.StartDate = DateTime.UtcNow.AddDays(1);
-            dto.EndDate = dto.StartDate.AddDays(2);
-            dto.HotelRoomId = Guid.NewGuid();
-            dto.UserId = Guid.NewGuid();
+            var model = _fixture.Create<HotelBookingModel>();
+            model.StartDate = DateTime.UtcNow.AddDays(1);
+            model.EndDate = model.StartDate.AddDays(2);
+            model.HotelRoomId = Guid.NewGuid();
+            model.UserId = Guid.NewGuid();
 
             var entity = _fixture.Create<HotelBookingEntity>();
-            _mapper.Map<HotelBookingEntity>(dto).Returns(entity);
+            _mapper.Map<HotelBookingEntity>(model).Returns(entity);
             _unitOfWork.HotelBookings.UpdateHotelBookingAsync(entity).Returns((HotelBookingEntity)null);
 
-            await Assert.ThrowsAsync<NotFoundException>(() => _service.UpdateHotelBookingAsync(dto));
+            await Assert.ThrowsAsync<NotFoundException>(() => _service.UpdateHotelBookingAsync(model));
         }
 
         [Fact]
-        public async Task UpdateHotelBookingAsync_ValidDto_ReturnsMappedDto()
+        public async Task UpdateHotelBookingAsync_ValidModel_ReturnsMappedModel()
         {
-            var dto = _fixture.Create<HotelBookingDto>();
-            dto.StartDate = DateTime.UtcNow.AddDays(1);
-            dto.EndDate = dto.StartDate.AddDays(2);
-            dto.HotelRoomId = Guid.NewGuid();
-            dto.UserId = Guid.NewGuid();
+            var model = _fixture.Create<HotelBookingModel>();
+            model.StartDate = DateTime.UtcNow.AddDays(1);
+            model.EndDate = model.StartDate.AddDays(2);
+            model.HotelRoomId = Guid.NewGuid();
+            model.UserId = Guid.NewGuid();
 
             var entity = _fixture.Create<HotelBookingEntity>();
             var updatedEntity = _fixture.Create<HotelBookingEntity>();
-            var resultDto = _fixture.Create<HotelBookingDto>();
+            var resultModel = _fixture.Create<HotelBookingModel>();
 
-            _mapper.Map<HotelBookingEntity>(dto).Returns(entity);
+            _mapper.Map<HotelBookingEntity>(model).Returns(entity);
             _unitOfWork.HotelBookings.UpdateHotelBookingAsync(entity).Returns(updatedEntity);
-            _mapper.Map<HotelBookingDto>(updatedEntity).Returns(resultDto);
+            _mapper.Map<HotelBookingModel>(updatedEntity).Returns(resultModel);
 
-            var result = await _service.UpdateHotelBookingAsync(dto);
+            var result = await _service.UpdateHotelBookingAsync(model);
 
-            Assert.Equal(resultDto, result);
+            Assert.Equal(resultModel, result);
         }
 
         [Fact]

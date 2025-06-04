@@ -48,7 +48,6 @@ namespace Travel_agency.DataAccess.Repository
         public async Task<TourEntity> AddTourAsync(TourEntity tour)
         {
             _context.Tours.Add(tour);
-            await _context.SaveChangesAsync();
             return tour;
         }
 
@@ -69,8 +68,6 @@ namespace Travel_agency.DataAccess.Repository
             existingTour.ImageUrl = updatedTour.ImageUrl;
             existingTour.Price = updatedTour.Price;
 
-            await _context.SaveChangesAsync();
-
             return existingTour;
         }
 
@@ -80,13 +77,7 @@ namespace Travel_agency.DataAccess.Repository
             if (tour != null)
             {
                 _context.Tours.Remove(tour);
-                await _context.SaveChangesAsync();
             }
-        }
-        
-        public IQueryable<TourEntity> AsQueryable()
-        {
-            return _context.Tours.AsNoTracking();
         }
     }
 }
