@@ -1,6 +1,6 @@
-﻿namespace Travel_agency.Core.Models.Hotels;
+﻿namespace Travel_agency.Core.BusinessModels.Hotels;
 
-public class HotelDto
+public class HotelModel
 {
     public Guid Id { get; set; } = Guid.NewGuid();
     public string Name { get; set; } = string.Empty;

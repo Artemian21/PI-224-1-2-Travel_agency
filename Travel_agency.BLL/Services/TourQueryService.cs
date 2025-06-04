@@ -2,7 +2,7 @@
 using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using Travel_agency.BLL.Abstractions;
-using Travel_agency.Core.Models.Tours;
+using Travel_agency.Core.BusinessModels.Tours;
 using Travel_agency.DataAccess.Abstraction;
 
 namespace Travel_agency.BLL.Services;
@@ -18,7 +18,7 @@ public class TourQueryService : ITourQueryService
         _mapper = mapper;
     }
 
-    public async Task<IEnumerable<TourDto>> GetFilteredToursAsync(TourFilterDto filter)
+    public async Task<IEnumerable<TourModel>> GetFilteredToursAsync(TourFilterModel filter)
     {
         var tours = await _unitOfWork.Tours.GetAllToursAsync();
 
@@ -60,10 +60,10 @@ public class TourQueryService : ITourQueryService
             tours = tours.Where(t => t.Price <= filter.Price.Value).ToList();
         }
 
-        return _mapper.Map<IEnumerable<TourDto>>(tours);
+        return _mapper.Map<IEnumerable<TourModel>>(tours);
     }
 
-    public async Task<IEnumerable<TourDto>> SearchToursAsync(string searchQuery)
+    public async Task<IEnumerable<TourModel>> SearchToursAsync(string searchQuery)
     {
         var tours = await _unitOfWork.Tours.GetAllToursAsync();
 
@@ -84,6 +84,6 @@ public class TourQueryService : ITourQueryService
             }
         }
 
-        return _mapper.Map<IEnumerable<TourDto>>(tours);
+        return _mapper.Map<IEnumerable<TourModel>>(tours);
     }
 }

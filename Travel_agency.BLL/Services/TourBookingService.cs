@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Travel_agency.BLL.Abstractions;
 using Travel_agency.Core.Enums;
 using Travel_agency.Core.Exceptions;
-using Travel_agency.Core.Models.Tours;
+using Travel_agency.Core.BusinessModels.Tours;
 using Travel_agency.DataAccess.Abstraction;
 using Travel_agency.DataAccess.Entities;
 
@@ -24,41 +24,41 @@ namespace Travel_agency.BLL.Services
             this._mapper = mapper;
         }
 
-        public async Task<IEnumerable<TourBookingDto>> GetAllTourBookingsAsync()
+        public async Task<IEnumerable<TourBookingModel>> GetAllTourBookingsAsync()
         {
             var tourBookingEntities = await _unitOfWork.TourBookings.GetAllTourBookingsAsync();
-            return _mapper.Map<IEnumerable<TourBookingDto>>(tourBookingEntities);
+            return _mapper.Map<IEnumerable<TourBookingModel>>(tourBookingEntities);
         }
 
-        public async Task<TourBookingDetailsDto?> GetTourBookingByIdAsync(Guid tourBookingId)
+        public async Task<TourBookingDetailsModel?> GetTourBookingByIdAsync(Guid tourBookingId)
         {
             var tourBookingEntity = await _unitOfWork.TourBookings.GetTourBookingByIdAsync(tourBookingId);
             if (tourBookingEntity == null)
                 throw new NotFoundException($"Tour booking with ID {tourBookingId} not found.");
 
 
-            return _mapper.Map<TourBookingDetailsDto>(tourBookingEntity);
+            return _mapper.Map<TourBookingDetailsModel>(tourBookingEntity);
         }
 
-        public async Task<TourBookingDto> AddTourBookingAsync(TourBookingDto tourBookingDto)
+        public async Task<TourBookingModel> AddTourBookingAsync(TourBookingModel tourBookingModel)
         {
-            ValidateTourBookingDto(tourBookingDto);
+            ValidateTourBookingModel(tourBookingModel);
 
-            var tourBookingEntity = _mapper.Map<TourBookingEntity>(tourBookingDto);
+            var tourBookingEntity = _mapper.Map<TourBookingEntity>(tourBookingModel);
             var addedTourBookingEntity = await _unitOfWork.TourBookings.AddTourBookingAsync(tourBookingEntity);
-            return _mapper.Map<TourBookingDto>(addedTourBookingEntity);
+            return _mapper.Map<TourBookingModel>(addedTourBookingEntity);
         }
 
-        public async Task<TourBookingDto> UpdateTourBookingAsync(TourBookingDto tourBookingDto)
+        public async Task<TourBookingModel> UpdateTourBookingAsync(TourBookingModel tourBookingModel)
         {
-            ValidateTourBookingDto(tourBookingDto);
+            ValidateTourBookingModel(tourBookingModel);
 
-            var tourBookingEntity = _mapper.Map<TourBookingEntity>(tourBookingDto);
+            var tourBookingEntity = _mapper.Map<TourBookingEntity>(tourBookingModel);
             var updatedTourBookingEntity = await _unitOfWork.TourBookings.UpdateTourBookingAsync(tourBookingEntity);
             if (updatedTourBookingEntity == null)
-                throw new NotFoundException($"Tour booking with ID {tourBookingDto.Id} not found.");
+                throw new NotFoundException($"Tour booking with ID {tourBookingModel.Id} not found.");
 
-            return _mapper.Map<TourBookingDto>(updatedTourBookingEntity);
+            return _mapper.Map<TourBookingModel>(updatedTourBookingEntity);
         }
 
         public async Task<bool> DeleteTourBookingAsync(Guid tourBookingId)
@@ -73,18 +73,18 @@ namespace Travel_agency.BLL.Services
             return true;
         }
 
-        private void ValidateTourBookingDto(TourBookingDto dto)
+        private void ValidateTourBookingModel(TourBookingModel model)
         {
-            if (dto == null)
-                throw new ArgumentNullException(nameof(dto), "Tour booking cannot be null.");
+            if (model == null)
+                throw new ArgumentNullException(nameof(model), "Tour booking cannot be null.");
 
-            if (dto.TourId == Guid.Empty)
+            if (model.TourId == Guid.Empty)
                 throw new BusinessValidationException("TourId is required.");
 
-            if (dto.UserId == Guid.Empty)
+            if (model.UserId == Guid.Empty)
                 throw new BusinessValidationException("UserId is required.");
 
-            if (!Enum.IsDefined(typeof(Status), dto.Status))
+            if (!Enum.IsDefined(typeof(Status), model.Status))
                 throw new BusinessValidationException("Invalid booking status.");
         }
     }

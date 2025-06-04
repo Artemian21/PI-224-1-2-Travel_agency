@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Travel_agency.BLL.Abstractions;
 using Travel_agency.Core.Enums;
 using Travel_agency.Core.Exceptions;
-using Travel_agency.Core.Models.Transports;
+using Travel_agency.Core.BusinessModels.Transports;
 using Travel_agency.DataAccess.Abstraction;
 using Travel_agency.DataAccess.Entities;
 
@@ -25,41 +25,41 @@ namespace Travel_agency.BLL.Services
             this._mapper = mapper;
         }
 
-        public async Task<IEnumerable<TicketBookingDto>> GetAllTicketBookingsAsync()
+        public async Task<IEnumerable<TicketBookingModel>> GetAllTicketBookingsAsync()
         {
             var ticketBookingEntities = await _unitOfWork.TicketBookings.GetAllTicketBookingsAsync();
-            return _mapper.Map<IEnumerable<TicketBookingDto>>(ticketBookingEntities);
+            return _mapper.Map<IEnumerable<TicketBookingModel>>(ticketBookingEntities);
         }
 
-        public async Task<TicketBookingDetailsDto?> GetTicketBookingByIdAsync(Guid ticketBookingId)
+        public async Task<TicketBookingDetailsModel?> GetTicketBookingByIdAsync(Guid ticketBookingId)
         {
             var ticketBookingEntity = await _unitOfWork.TicketBookings.GetTicketBookingByIdAsync(ticketBookingId);
             if (ticketBookingEntity == null)
                 throw new NotFoundException($"Ticket Booking with ID {ticketBookingId} not found.");
 
-            return _mapper.Map<TicketBookingDetailsDto>(ticketBookingEntity);
+            return _mapper.Map<TicketBookingDetailsModel>(ticketBookingEntity);
         }
 
-        public async Task<TicketBookingDto> AddTicketBookingAsync(TicketBookingDto ticketBookingDto)
+        public async Task<TicketBookingModel> AddTicketBookingAsync(TicketBookingModel ticketBookingModel)
         {
-            ValidateTicketBookingDto(ticketBookingDto);
+            ValidateTicketBookingModel(ticketBookingModel);
 
-            var ticketBookingEntity = _mapper.Map<TicketBookingEntity>(ticketBookingDto);
+            var ticketBookingEntity = _mapper.Map<TicketBookingEntity>(ticketBookingModel);
             var addedTicketBookingEntity = await _unitOfWork.TicketBookings.AddTicketBookingAsync(ticketBookingEntity);
-            return _mapper.Map<TicketBookingDto>(addedTicketBookingEntity);
+            return _mapper.Map<TicketBookingModel>(addedTicketBookingEntity);
         }
 
-        public async Task<TicketBookingDto> UpdateTicketBookingAsync(TicketBookingDto ticketBookingDto)
+        public async Task<TicketBookingModel> UpdateTicketBookingAsync(TicketBookingModel ticketBookingModel)
         {
-            ValidateTicketBookingDto(ticketBookingDto);
+            ValidateTicketBookingModel(ticketBookingModel);
 
-            var ticketBookingEntity = _mapper.Map<TicketBookingEntity>(ticketBookingDto);
+            var ticketBookingEntity = _mapper.Map<TicketBookingEntity>(ticketBookingModel);
             var updatedTicketBookingEntity = await _unitOfWork.TicketBookings.UpdateTicketBookingAsync(ticketBookingEntity);
             if (updatedTicketBookingEntity == null)
-                throw new NotFoundException($"Ticket Booking with ID {ticketBookingDto.Id} not found.");
+                throw new NotFoundException($"Ticket Booking with ID {ticketBookingModel.Id} not found.");
 
 
-            return updatedTicketBookingEntity == null ? null : _mapper.Map<TicketBookingDto>(updatedTicketBookingEntity);
+            return updatedTicketBookingEntity == null ? null : _mapper.Map<TicketBookingModel>(updatedTicketBookingEntity);
         }
 
         public async Task<bool> DeleteTicketBookingAsync(Guid ticketBookingId)
@@ -74,18 +74,18 @@ namespace Travel_agency.BLL.Services
             return true;
         }
 
-        private void ValidateTicketBookingDto(TicketBookingDto dto)
+        private void ValidateTicketBookingModel(TicketBookingModel model)
         {
-            if(dto == null)
-                throw new ArgumentNullException(nameof(dto), "Ticket booking cannot be null.");
+            if(model == null)
+                throw new ArgumentNullException(nameof(model), "Ticket booking cannot be null.");
 
-            if (dto.TransportId == Guid.Empty)
+            if (model.TransportId == Guid.Empty)
                 throw new BusinessValidationException("TransportId is required.");
 
-            if (dto.UserId == Guid.Empty)
+            if (model.UserId == Guid.Empty)
                 throw new BusinessValidationException("UserId is required.");
 
-            if (!Enum.IsDefined(typeof(Status), dto.Status))
+            if (!Enum.IsDefined(typeof(Status), model.Status))
                 throw new BusinessValidationException("Invalid booking status.");
         }
     }

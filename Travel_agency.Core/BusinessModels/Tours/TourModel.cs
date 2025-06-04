@@ -1,8 +1,8 @@
 ﻿using Travel_agency.Core.Enums;
 
-namespace Travel_agency.Core.Models.Tours;
+namespace Travel_agency.Core.BusinessModels.Tours;
 
-public class TourDto
+public class TourModel
 {
     public Guid Id { get; set; } = Guid.NewGuid();
     public string Name { get; set; } = string.Empty;

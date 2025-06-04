@@ -5,8 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Travel_agency.BLL.Abstractions;
 using Travel_agency.BLL.Services;
-using Travel_agency.Core.Models;
-using Travel_agency.Core.Models.Transports;
+using Travel_agency.Core.BusinessModels;
+using Travel_agency.Core.BusinessModels.Transports;
 using Travel_agency.PL.Models.Requests;
 using Travel_agency.PL.Models.Responses;
 
@@ -76,14 +76,14 @@ namespace Travel_agency.PL.Controllers
 
             var userId = Guid.Parse(userIdClaim.Value);
 
-            var ticketBookingDto = new TicketBookingDto
+            var ticketBookingModel = new TicketBookingModel
             {
                 UserId = userId,
                 TransportId = ticketBooking.TransportId,
                 Status = ticketBooking.Status
             };
 
-            var createdBooking = await _ticketBookingService.AddTicketBookingAsync(ticketBookingDto);
+            var createdBooking = await _ticketBookingService.AddTicketBookingAsync(ticketBookingModel);
             return CreatedAtAction(nameof(GetTicketBookingById), new { id = createdBooking.Id }, createdBooking);
         }
 
@@ -103,12 +103,12 @@ namespace Travel_agency.PL.Controllers
 
             var userId = Guid.Parse(userIdClaim.Value);
 
-            var ticketBookingDto = _mapper.Map<TicketBookingDto>(ticketBooking);
-            ticketBookingDto.Id = id;
-            ticketBookingDto.UserId = userId;
+            var ticketBookingModel = _mapper.Map<TicketBookingModel>(ticketBooking);
+            ticketBookingModel.Id = id;
+            ticketBookingModel.UserId = userId;
 
 
-            var updatedBooking = await _ticketBookingService.UpdateTicketBookingAsync(ticketBookingDto);
+            var updatedBooking = await _ticketBookingService.UpdateTicketBookingAsync(ticketBookingModel);
             if (updatedBooking == null)
             {
                 return NotFound();

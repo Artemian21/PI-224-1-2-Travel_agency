@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using Travel_agency.BLL.Abstractions;
 using Travel_agency.Core.Enums;
 using Travel_agency.Core.Exceptions;
-using Travel_agency.Core.Models.Users;
+using Travel_agency.Core.BusinessModels.Users;
 using Travel_agency.DataAccess.Abstraction;
 using Travel_agency.DataAccess.Entities;
 
@@ -30,31 +30,31 @@ namespace Travel_agency.BLL.Services
             _mapper = mapper;
         }
 
-        public async Task<UserDto> Register(RegisterUserDto registerDto)
+        public async Task<UserModel> Register(RegisterUserModel register)
         {
-            if (registerDto == null)
-                throw new ArgumentNullException(nameof(registerDto), "Register data cannot be null");
+            if (register == null)
+                throw new ArgumentNullException(nameof(register), "Register data cannot be null");
 
-            var existingByEmail = await _userRepository.GetUserByEmailAsync(registerDto.Email);
+            var existingByEmail = await _userRepository.GetUserByEmailAsync(register.Email);
             if (existingByEmail != null)
                 throw new ConflictException("Email is already in use");
 
-            if (!IsPasswordStrong(registerDto.Password))
+            if (!IsPasswordStrong(register.Password))
                 throw new ValidationException("Password must be at least 8 characters long and include uppercase, lowercase, digit, and special character");
 
-            var passwordHash = _passwordHasher.GenerateHash(registerDto.Password);
+            var passwordHash = _passwordHasher.GenerateHash(register.Password);
 
             var userEntity = new UserEntity
             {
                 Id = Guid.NewGuid(),
-                Username = registerDto.Username,
-                Email = registerDto.Email,
+                Username = register.Username,
+                Email = register.Email,
                 PasswordHash = passwordHash,
                 Role = UserRole.Registered
             };
 
             var addedUser = await _userRepository.AddUserAsync(userEntity);
-            return _mapper.Map<UserDto>(addedUser);
+            return _mapper.Map<UserModel>(addedUser);
         }
 
         public async Task<string> Login(string email, string password)
@@ -69,8 +69,8 @@ namespace Travel_agency.BLL.Services
             if (!_passwordHasher.VerifyHash(password, userEntity.PasswordHash))
                 throw new UnauthorizedAccessException("Invalid password");
 
-            var userDto = _mapper.Map<UserDto>(userEntity);
-            return _jwtProvider.GenerateToken(userDto);
+            var userModel = _mapper.Map<UserModel>(userEntity);
+            return _jwtProvider.GenerateToken(userModel);
         }
 
         private bool IsPasswordStrong(string password)

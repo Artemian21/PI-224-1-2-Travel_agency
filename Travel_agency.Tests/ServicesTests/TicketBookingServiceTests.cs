@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using Travel_agency.BLL.Services;
 using Travel_agency.Core.Enums;
 using Travel_agency.Core.Exceptions;
-using Travel_agency.Core.Models.Transports;
+using Travel_agency.Core.BusinessModels.Transports;
 using Travel_agency.DataAccess.Abstraction;
 using Travel_agency.DataAccess.Entities;
 using NSubstitute;
@@ -39,31 +39,31 @@ public class TicketBookingServiceTests
     }
 
     [Fact]
-    public async Task GetAllTicketBookingsAsync_ReturnsMappedDtos()
+    public async Task GetAllTicketBookingsAsync_ReturnsMappedModels()
     {
         var entities = _fixture.CreateMany<TicketBookingEntity>(3);
-        var dtos = _fixture.CreateMany<TicketBookingDto>(3);
+        var models = _fixture.CreateMany<TicketBookingModel>(3);
         _unitOfWork.TicketBookings.GetAllTicketBookingsAsync().Returns(Task.FromResult(entities));
-        _mapper.Map<IEnumerable<TicketBookingDto>>(entities).Returns(dtos);
+        _mapper.Map<IEnumerable<TicketBookingModel>>(entities).Returns(models);
 
         var result = await _service.GetAllTicketBookingsAsync();
 
-        Assert.Equal(dtos, result);
+        Assert.Equal(models, result);
     }
 
     [Fact]
-    public async Task GetTicketBookingByIdAsync_ReturnsDto_WhenExists()
+    public async Task GetTicketBookingByIdAsync_ReturnsModel_WhenExists()
     {
         var entity = _fixture.Create<TicketBookingEntity>();
-        var dto = _fixture.Create<TicketBookingDetailsDto>();
+        var model = _fixture.Create<TicketBookingDetailsModel>();
         var id = Guid.NewGuid();
 
         _unitOfWork.TicketBookings.GetTicketBookingByIdAsync(id).Returns(Task.FromResult(entity));
-        _mapper.Map<TicketBookingDetailsDto>(entity).Returns(dto);
+        _mapper.Map<TicketBookingDetailsModel>(entity).Returns(model);
 
         var result = await _service.GetTicketBookingByIdAsync(id);
 
-        Assert.Equal(dto, result);
+        Assert.Equal(model, result);
     }
 
     [Fact]
@@ -77,9 +77,9 @@ public class TicketBookingServiceTests
     }
 
     [Fact]
-    public async Task AddTicketBookingAsync_ValidInput_ReturnsMappedDto()
+    public async Task AddTicketBookingAsync_ValidInput_ReturnsMappedModel()
     {
-        var dto = _fixture.Build<TicketBookingDto>()
+        var model = _fixture.Build<TicketBookingModel>()
             .With(x => x.TransportId, Guid.NewGuid())
             .With(x => x.UserId, Guid.NewGuid())
             .With(x => x.Status, Status.Confirmed)
@@ -87,29 +87,29 @@ public class TicketBookingServiceTests
 
         var entity = _fixture.Create<TicketBookingEntity>();
         var addedEntity = _fixture.Create<TicketBookingEntity>();
-        var expectedDto = _fixture.Create<TicketBookingDto>();
+        var expectedModel = _fixture.Create<TicketBookingModel>();
 
-        _mapper.Map<TicketBookingEntity>(dto).Returns(entity);
+        _mapper.Map<TicketBookingEntity>(model).Returns(entity);
         _unitOfWork.TicketBookings.AddTicketBookingAsync(entity).Returns(Task.FromResult(addedEntity));
-        _mapper.Map<TicketBookingDto>(addedEntity).Returns(expectedDto);
+        _mapper.Map<TicketBookingModel>(addedEntity).Returns(expectedModel);
 
-        var result = await _service.AddTicketBookingAsync(dto);
+        var result = await _service.AddTicketBookingAsync(model);
 
-        Assert.Equal(expectedDto, result);
+        Assert.Equal(expectedModel, result);
     }
 
     [Fact]
     public async Task AddTicketBookingAsync_Throws_WhenInvalid()
     {
-        var dto = new TicketBookingDto(); // Invalid dto (empty GUIDs)
+        var model = new TicketBookingModel(); // Invalid model (empty GUIDs)
 
-        await Assert.ThrowsAsync<BusinessValidationException>(() => _service.AddTicketBookingAsync(dto));
+        await Assert.ThrowsAsync<BusinessValidationException>(() => _service.AddTicketBookingAsync(model));
     }
     
     [Fact]
-    public async Task UpdateTicketBookingAsync_ValidInput_ReturnsUpdatedDto()
+    public async Task UpdateTicketBookingAsync_ValidInput_ReturnsUpdatedModel()
     {
-        var dto = _fixture.Build<TicketBookingDto>()
+        var model = _fixture.Build<TicketBookingModel>()
             .With(x => x.TransportId, Guid.NewGuid())
             .With(x => x.UserId, Guid.NewGuid())
             .With(x => x.Status, Status.Confirmed)
@@ -117,32 +117,32 @@ public class TicketBookingServiceTests
 
         var entity = _fixture.Create<TicketBookingEntity>();
         var updatedEntity = _fixture.Create<TicketBookingEntity>();
-        var expectedDto = _fixture.Create<TicketBookingDto>();
+        var expectedModel = _fixture.Create<TicketBookingModel>();
 
-        _mapper.Map<TicketBookingEntity>(dto).Returns(entity);
+        _mapper.Map<TicketBookingEntity>(model).Returns(entity);
         _unitOfWork.TicketBookings.UpdateTicketBookingAsync(entity).Returns(Task.FromResult(updatedEntity));
-        _mapper.Map<TicketBookingDto>(updatedEntity).Returns(expectedDto);
+        _mapper.Map<TicketBookingModel>(updatedEntity).Returns(expectedModel);
 
-        var result = await _service.UpdateTicketBookingAsync(dto);
+        var result = await _service.UpdateTicketBookingAsync(model);
 
-        Assert.Equal(expectedDto, result);
+        Assert.Equal(expectedModel, result);
     }
 
     [Fact]
     public async Task UpdateTicketBookingAsync_Throws_WhenNotFound()
     {
-        var dto = _fixture.Build<TicketBookingDto>()
+        var model = _fixture.Build<TicketBookingModel>()
             .With(x => x.TransportId, Guid.NewGuid())
             .With(x => x.UserId, Guid.NewGuid())
             .With(x => x.Status, Status.Confirmed)
             .Create();
 
         var entity = _fixture.Create<TicketBookingEntity>();
-        _mapper.Map<TicketBookingEntity>(dto).Returns(entity);
+        _mapper.Map<TicketBookingEntity>(model).Returns(entity);
         _unitOfWork.TicketBookings.UpdateTicketBookingAsync(entity).Returns(Task.FromResult<TicketBookingEntity>(null));
 
-        var ex = await Assert.ThrowsAsync<NotFoundException>(() => _service.UpdateTicketBookingAsync(dto));
-        Assert.Equal($"Ticket Booking with ID {dto.Id} not found.", ex.Message);
+        var ex = await Assert.ThrowsAsync<NotFoundException>(() => _service.UpdateTicketBookingAsync(model));
+        Assert.Equal($"Ticket Booking with ID {model.Id} not found.", ex.Message);
     }
 
     [Fact]
@@ -169,13 +169,13 @@ public class TicketBookingServiceTests
     }
 
     [Fact]
-    public async Task AddTicketBookingAsync_Throws_WhenDtoIsNull()
+    public async Task AddTicketBookingAsync_Throws_WhenModelIsNull()
     {
         await Assert.ThrowsAsync<ArgumentNullException>(() => _service.AddTicketBookingAsync(null));
     }
 
     [Fact]
-    public async Task UpdateTicketBookingAsync_Throws_WhenDtoIsNull()
+    public async Task UpdateTicketBookingAsync_Throws_WhenModelIsNull()
     {
         await Assert.ThrowsAsync<ArgumentNullException>(() => _service.UpdateTicketBookingAsync(null));
     }

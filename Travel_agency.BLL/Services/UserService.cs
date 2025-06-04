@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Travel_agency.BLL.Abstractions;
 using Travel_agency.Core.Enums;
 using Travel_agency.Core.Exceptions;
-using Travel_agency.Core.Models.Users;
+using Travel_agency.Core.BusinessModels.Users;
 using Travel_agency.DataAccess.Abstraction;
 using Travel_agency.DataAccess.Entities;
 
@@ -49,13 +49,13 @@ namespace Travel_agency.BLL.Services
             return true;
         }
 
-        public async Task<IEnumerable<UserDto>> GetAllUserAsync()
+        public async Task<IEnumerable<UserModel>> GetAllUserAsync()
         {
             var userEntities = await _unitOfWork.Users.GetAllUsers();
-            return _mapper.Map<IEnumerable<UserDto>>(userEntities);
+            return _mapper.Map<IEnumerable<UserModel>>(userEntities);
         }
 
-        public async Task<UserWithBookingsDto> GetUserByEmailAsync(string email)
+        public async Task<UserWithBookingsModel> GetUserByEmailAsync(string email)
         {
             if (string.IsNullOrWhiteSpace(email))
             {
@@ -68,10 +68,10 @@ namespace Travel_agency.BLL.Services
                 throw new NotFoundException($"User with email '{email}' not found.");
             }
 
-            return _mapper.Map<UserWithBookingsDto>(userEntity);
+            return _mapper.Map<UserWithBookingsModel>(userEntity);
         }
 
-        public async Task<UserWithBookingsDto> GetUserByIdAsync(Guid userId)
+        public async Task<UserWithBookingsModel> GetUserByIdAsync(Guid userId)
         {
             var userEntity = await _unitOfWork.Users.GetUserByIdAsync(userId);
             if (userEntity == null)
@@ -79,35 +79,35 @@ namespace Travel_agency.BLL.Services
                 throw new NotFoundException($"User with ID {userId} not found.");
             }
 
-            return _mapper.Map<UserWithBookingsDto>(userEntity);
+            return _mapper.Map<UserWithBookingsModel>(userEntity);
         }
 
-        public async Task<UserDto> UpdateUserProfileAsync(UserDto updateDto)
+        public async Task<UserModel> UpdateUserProfileAsync(UserModel updateModel)
         {
-            ValidateUserDto(updateDto);
+            ValidateUserModel(updateModel);
 
-            var userEntity = await _unitOfWork.Users.GetUserByIdAsync(updateDto.Id);
-            var updatedUserEntity = await _unitOfWork.Users.UpdateUserAsync(_mapper.Map<UserEntity>(updateDto));
+            var userEntity = await _unitOfWork.Users.GetUserByIdAsync(updateModel.Id);
+            var updatedUserEntity = await _unitOfWork.Users.UpdateUserAsync(_mapper.Map<UserEntity>(updateModel));
             if (updatedUserEntity == null)
             {
-                throw new NotFoundException($"User with ID {updateDto.Id} not found.");
+                throw new NotFoundException($"User with ID {updateModel.Id} not found.");
             }
 
-            return _mapper.Map<UserDto>(updatedUserEntity);
+            return _mapper.Map<UserModel>(updatedUserEntity);
         }
 
-        private void ValidateUserDto(UserDto dto)
+        private void ValidateUserModel(UserModel model)
         {
-            if (dto == null)
-                throw new ArgumentNullException(nameof(dto), "User object cannot be null.");
+            if (model == null)
+                throw new ArgumentNullException(nameof(model), "User object cannot be null.");
 
-            if (string.IsNullOrWhiteSpace(dto.Username))
+            if (string.IsNullOrWhiteSpace(model.Username))
                 throw new BusinessValidationException("Username is required.");
 
-            if (string.IsNullOrWhiteSpace(dto.Email))
+            if (string.IsNullOrWhiteSpace(model.Email))
                 throw new BusinessValidationException("Email is required.");
 
-            if (!Enum.IsDefined(typeof(UserRole), dto.Role))
+            if (!Enum.IsDefined(typeof(UserRole), model.Role))
                 throw new BusinessValidationException("Invalid user role.");
         }
     }

@@ -5,7 +5,7 @@ using NSubstitute;
 using Travel_agency.BLL.Services;
 using Travel_agency.Core.Enums;
 using Travel_agency.Core.Exceptions;
-using Travel_agency.Core.Models.Users;
+using Travel_agency.Core.BusinessModels.Users;
 using Travel_agency.DataAccess.Abstraction;
 using Travel_agency.DataAccess.Entities;
 
@@ -85,13 +85,13 @@ public class UserServiceTests
     public async Task GetAllUserAsync_ReturnsMappedUsers()
     {
         var users = _fixture.CreateMany<UserEntity>();
-        var dtoList = _fixture.CreateMany<UserDto>();
+        var modelList = _fixture.CreateMany<UserModel>();
         _unitOfWork.Users.GetAllUsers().Returns(users);
-        _mapper.Map<IEnumerable<UserDto>>(users).Returns(dtoList);
+        _mapper.Map<IEnumerable<UserModel>>(users).Returns(modelList);
 
         var result = await _service.GetAllUserAsync();
 
-        Assert.Equal(dtoList, result);
+        Assert.Equal(modelList, result);
     }
 
     [Fact]
@@ -109,17 +109,17 @@ public class UserServiceTests
     }
 
     [Fact]
-    public async Task GetUserByEmailAsync_Found_ReturnsDto()
+    public async Task GetUserByEmailAsync_Found_ReturnsModel()
     {
         var entity = _fixture.Create<UserEntity>();
-        var dto = _fixture.Create<UserWithBookingsDto>();
+        var model = _fixture.Create<UserWithBookingsModel>();
 
         _unitOfWork.Users.GetUserByEmailAsync(entity.Email).Returns(entity);
-        _mapper.Map<UserWithBookingsDto>(entity).Returns(dto);
+        _mapper.Map<UserWithBookingsModel>(entity).Returns(model);
 
         var result = await _service.GetUserByEmailAsync(entity.Email);
 
-        Assert.Equal(dto, result);
+        Assert.Equal(model, result);
     }
 
     [Fact]
@@ -132,54 +132,54 @@ public class UserServiceTests
     }
 
     [Fact]
-    public async Task GetUserByIdAsync_Found_ReturnsDto()
+    public async Task GetUserByIdAsync_Found_ReturnsModel()
     {
         var user = _fixture.Create<UserEntity>();
-        var dto = _fixture.Create<UserWithBookingsDto>();
+        var model = _fixture.Create<UserWithBookingsModel>();
 
         _unitOfWork.Users.GetUserByIdAsync(user.Id).Returns(user);
-        _mapper.Map<UserWithBookingsDto>(user).Returns(dto);
+        _mapper.Map<UserWithBookingsModel>(user).Returns(model);
 
         var result = await _service.GetUserByIdAsync(user.Id);
 
-        Assert.Equal(dto, result);
+        Assert.Equal(model, result);
     }
 
     [Fact]
-    public async Task UpdateUserProfileAsync_InvalidDto_ThrowsValidation()
+    public async Task UpdateUserProfileAsync_InvalidModel_ThrowsValidation()
     {
-        var invalidDto = _fixture.Build<UserDto>().With(x => x.Username, "").Create();
+        var invalidModel = _fixture.Build<UserModel>().With(x => x.Username, "").Create();
 
-        await Assert.ThrowsAsync<BusinessValidationException>(() => _service.UpdateUserProfileAsync(invalidDto));
+        await Assert.ThrowsAsync<BusinessValidationException>(() => _service.UpdateUserProfileAsync(invalidModel));
     }
 
     [Fact]
     public async Task UpdateUserProfileAsync_UserNotFound_ThrowsNotFound()
     {
-        var dto = _fixture.Create<UserDto>();
-        var entity = _fixture.Build<UserEntity>().With(x => x.Id, dto.Id).Create();
+        var model = _fixture.Create<UserModel>();
+        var entity = _fixture.Build<UserEntity>().With(x => x.Id, model.Id).Create();
 
-        _unitOfWork.Users.GetUserByIdAsync(dto.Id).Returns(entity);
+        _unitOfWork.Users.GetUserByIdAsync(model.Id).Returns(entity);
         _unitOfWork.Users.UpdateUserAsync(entity).Returns((UserEntity?)null);
 
-        await Assert.ThrowsAsync<NotFoundException>(() => _service.UpdateUserProfileAsync(dto));
+        await Assert.ThrowsAsync<NotFoundException>(() => _service.UpdateUserProfileAsync(model));
     }
 
     [Fact]
-    public async Task UpdateUserProfileAsync_Success_ReturnsMappedDto()
+    public async Task UpdateUserProfileAsync_Success_ReturnsMappedModel()
     {
-        var dto = _fixture.Create<UserDto>();
-        var entity = _fixture.Build<UserEntity>().With(x => x.Id, dto.Id).Create();
+        var model = _fixture.Create<UserModel>();
+        var entity = _fixture.Build<UserEntity>().With(x => x.Id, model.Id).Create();
         var updatedEntity = _fixture.Create<UserEntity>();
-        var updatedDto = _fixture.Create<UserDto>();
+        var updatedModel = _fixture.Create<UserModel>();
 
-        _unitOfWork.Users.GetUserByIdAsync(dto.Id).Returns(entity);
-        _mapper.Map<UserEntity>(dto).Returns(entity);
+        _unitOfWork.Users.GetUserByIdAsync(model.Id).Returns(entity);
+        _mapper.Map<UserEntity>(model).Returns(entity);
         _unitOfWork.Users.UpdateUserAsync(entity).Returns(updatedEntity);
-        _mapper.Map<UserDto>(updatedEntity).Returns(updatedDto);
+        _mapper.Map<UserModel>(updatedEntity).Returns(updatedModel);
 
-        var result = await _service.UpdateUserProfileAsync(dto);
+        var result = await _service.UpdateUserProfileAsync(model);
 
-        Assert.Equal(updatedDto, result);
+        Assert.Equal(updatedModel, result);
     }
 }

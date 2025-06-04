@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Travel_agency.Core.Models.Tours
+namespace Travel_agency.Core.BusinessModels.Tours
 {
     public class PagedResult<T>
     {

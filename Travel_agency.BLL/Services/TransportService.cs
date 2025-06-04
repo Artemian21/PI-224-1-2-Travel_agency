@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Travel_agency.BLL.Abstractions;
 using Travel_agency.Core.Exceptions;
-using Travel_agency.Core.Models.Transports;
+using Travel_agency.Core.BusinessModels.Transports;
 using Travel_agency.DataAccess.Abstraction;
 using Travel_agency.DataAccess.Entities;
 
@@ -24,41 +24,41 @@ namespace Travel_agency.BLL.Services
             this._mapper = mapper;
         }
 
-        public async Task<IEnumerable<TransportDto>> GetAllTransportsAsync()
+        public async Task<IEnumerable<TransportModel>> GetAllTransportsAsync()
         {
             var transportEntities = await _unitOfWork.Transports.GetAllTransportsAsync();
-            return _mapper.Map<IEnumerable<TransportDto>>(transportEntities);
+            return _mapper.Map<IEnumerable<TransportModel>>(transportEntities);
         }
 
-        public async Task<TransportWithBookingsDto> GetTransportByIdAsync(Guid transportId)
+        public async Task<TransportWithBookingsModel> GetTransportByIdAsync(Guid transportId)
         {
             var transportEntity = await _unitOfWork.Transports.GetTransportByIdAsync(transportId);
             if (transportEntity == null)
                 throw new NotFoundException($"Transport with ID {transportId} not found.");
 
-            return _mapper.Map<TransportWithBookingsDto>(transportEntity);
+            return _mapper.Map<TransportWithBookingsModel>(transportEntity);
         }
 
-        public async Task<TransportDto> AddTransportAsync(TransportDto transportDto)
+        public async Task<TransportModel> AddTransportAsync(TransportModel transportModel)
         {
-            ValidateTransportDto(transportDto);
+            ValidateTransportModel(transportModel);
 
-            var transportEntity = _mapper.Map<TransportEntity>(transportDto);
+            var transportEntity = _mapper.Map<TransportEntity>(transportModel);
             var addedTransportEntity = await _unitOfWork.Transports.AddTransportAsync(transportEntity);
-            return _mapper.Map<TransportDto>(addedTransportEntity);
+            return _mapper.Map<TransportModel>(addedTransportEntity);
         }
 
-        public async Task<TransportDto> UpdateTransportAsync(TransportDto transportDto)
+        public async Task<TransportModel> UpdateTransportAsync(TransportModel transportModel)
         {
-            ValidateTransportDto(transportDto);
+            ValidateTransportModel(transportModel);
 
-            var transportEntity = _mapper.Map<TransportEntity>(transportDto);
+            var transportEntity = _mapper.Map<TransportEntity>(transportModel);
             var updatedTransportEntity = await _unitOfWork.Transports.UpdateTransportAsync(transportEntity);
 
             if (updatedTransportEntity == null)
-                throw new NotFoundException($"Transport with ID {transportDto.Id} not found.");
+                throw new NotFoundException($"Transport with ID {transportModel.Id} not found.");
 
-            return _mapper.Map<TransportDto>(updatedTransportEntity);
+            return _mapper.Map<TransportModel>(updatedTransportEntity);
         }
 
         public async Task<bool> DeleteTransportAsync(Guid transportId)
@@ -73,24 +73,24 @@ namespace Travel_agency.BLL.Services
             return true;
         }
 
-        private void ValidateTransportDto(TransportDto dto)
+        private void ValidateTransportModel(TransportModel model)
         {
-            if (dto == null)
-                throw new ArgumentNullException(nameof(dto));
+            if (model == null)
+                throw new ArgumentNullException(nameof(model));
 
-            if (dto.Price < 0)
+            if (model.Price < 0)
                 throw new BusinessValidationException("Price cannot be negative.");
 
-            if (string.IsNullOrWhiteSpace(dto.Company))
+            if (string.IsNullOrWhiteSpace(model.Company))
                 throw new BusinessValidationException("Company name is required.");
 
-            if (string.IsNullOrWhiteSpace(dto.Type))
+            if (string.IsNullOrWhiteSpace(model.Type))
                 throw new BusinessValidationException("Transport type is required.");
 
-            if (dto.DepartureDate < DateTime.UtcNow)
+            if (model.DepartureDate < DateTime.UtcNow)
                 throw new BusinessValidationException("Departure date cannot be in the past.");
 
-            if (dto.ArrivalDate < dto.DepartureDate)
+            if (model.ArrivalDate < model.DepartureDate)
                 throw new BusinessValidationException("Arrival date must be after the departure date.");
         }
     }

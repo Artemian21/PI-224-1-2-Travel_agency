@@ -5,8 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Travel_agency.BLL.Abstractions;
 using Travel_agency.BLL.Services;
-using Travel_agency.Core.Models;
-using Travel_agency.Core.Models.Hotels;
+using Travel_agency.Core.BusinessModels;
+using Travel_agency.Core.BusinessModels.Hotels;
 using Travel_agency.PL.Models.Requests;
 using Travel_agency.PL.Models.Responses;
 
@@ -77,10 +77,10 @@ namespace Travel_agency.PL.Controllers
 
             var userId = Guid.Parse(userIdClaim.Value);
 
-            var hotelBookingDto = _mapper.Map<HotelBookingDto>(hotelBooking);
-            hotelBookingDto.UserId = userId;
+            var hotelBookingModel = _mapper.Map<HotelBookingModel>(hotelBooking);
+            hotelBookingModel.UserId = userId;
 
-            var createdBooking = await _hotelBookingService.AddHotelBookingAsync(hotelBookingDto);
+            var createdBooking = await _hotelBookingService.AddHotelBookingAsync(hotelBookingModel);
             return Ok(_mapper.Map<HotelBookingResponse>(createdBooking));
         }
 
@@ -100,11 +100,11 @@ namespace Travel_agency.PL.Controllers
 
             var userId = Guid.Parse(userIdClaim.Value);
 
-            var hotelBookingDto = _mapper.Map<HotelBookingDto>(hotelBooking);
-            hotelBookingDto.Id = id;
-            hotelBookingDto.UserId = userId;
+            var hotelBookingModel = _mapper.Map<HotelBookingModel>(hotelBooking);
+            hotelBookingModel.Id = id;
+            hotelBookingModel.UserId = userId;
 
-            var updatedBooking = await _hotelBookingService.UpdateHotelBookingAsync(hotelBookingDto);
+            var updatedBooking = await _hotelBookingService.UpdateHotelBookingAsync(hotelBookingModel);
             if (updatedBooking == null)
             {
                 return NotFound();

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Travel_agency.BLL.Abstractions;
 using Travel_agency.Core.Enums;
 using Travel_agency.Core.Exceptions;
-using Travel_agency.Core.Models.Tours;
+using Travel_agency.Core.BusinessModels.Tours;
 using Travel_agency.DataAccess.Abstraction;
 using Travel_agency.DataAccess.Entities;
 
@@ -25,19 +25,19 @@ namespace Travel_agency.BLL.Services
             this._mapper = mapper;
         }
 
-        public async Task<IEnumerable<TourDto>> GetAllToursAsync()
+        public async Task<IEnumerable<TourModel>> GetAllToursAsync()
         {
             var tourEntities = await _unitOfWork.Tours.GetAllToursAsync();
-            return _mapper.Map<IEnumerable<TourDto>>(tourEntities);
+            return _mapper.Map<IEnumerable<TourModel>>(tourEntities);
         }
 
-        public async Task<PagedResult<TourDto>> GetPagedToursAsync(int pageNumber, int pageSize)
+        public async Task<PagedResult<TourModel>> GetPagedToursAsync(int pageNumber, int pageSize)
         {
             var totalCount = await _unitOfWork.Tours.GetTotalToursCountAsync();
             var tours = await _unitOfWork.Tours.GetToursPagedAsync(pageNumber, pageSize);
-            var mappedTours = _mapper.Map<IEnumerable<TourDto>>(tours);
+            var mappedTours = _mapper.Map<IEnumerable<TourModel>>(tours);
 
-            return new PagedResult<TourDto>
+            return new PagedResult<TourModel>
             {
                 Items = mappedTours,
                 PageNumber = pageNumber,
@@ -46,35 +46,35 @@ namespace Travel_agency.BLL.Services
             };
         }
 
-        public async Task<TourWithBookingsDto> GetTourByIdAsync(Guid tourId)
+        public async Task<TourWithBookingsModel> GetTourByIdAsync(Guid tourId)
         {
             var tourEntity = await _unitOfWork.Tours.GetTourByIdAsync(tourId);
             if (tourEntity == null)
                 throw new NotFoundException($"Tour with ID {tourId} not found.");
 
-            return _mapper.Map<TourWithBookingsDto>(tourEntity);
+            return _mapper.Map<TourWithBookingsModel>(tourEntity);
         }
 
-        public async Task<TourDto> AddTourAsync(TourDto tourDto)
+        public async Task<TourModel> AddTourAsync(TourModel tourModel)
         {
-            ValidateTourDto(tourDto);
+            ValidateTourModel(tourModel);
 
-            var tourEntity = _mapper.Map<TourEntity>(tourDto);
+            var tourEntity = _mapper.Map<TourEntity>(tourModel);
             var addedTourEntity = await _unitOfWork.Tours.AddTourAsync(tourEntity);
-            return _mapper.Map<TourDto>(addedTourEntity);
+            return _mapper.Map<TourModel>(addedTourEntity);
         }
 
-        public async Task<TourDto> UpdateTourAsync(TourDto tourDto)
+        public async Task<TourModel> UpdateTourAsync(TourModel tourModel)
         {
-            ValidateTourDto(tourDto);
+            ValidateTourModel(tourModel);
 
-            var tourEntity = _mapper.Map<TourEntity>(tourDto);
+            var tourEntity = _mapper.Map<TourEntity>(tourModel);
             var updatedTourEntity = await _unitOfWork.Tours.UpdateTourAsync(tourEntity);
 
             if (updatedTourEntity == null)
-                throw new NotFoundException($"Tour with ID {tourDto.Id} not found.");
+                throw new NotFoundException($"Tour with ID {tourModel.Id} not found.");
 
-            return _mapper.Map<TourDto>(updatedTourEntity);
+            return _mapper.Map<TourModel>(updatedTourEntity);
         }
 
         public async Task<bool> DeleteTourAsync(Guid tourId)
@@ -89,30 +89,30 @@ namespace Travel_agency.BLL.Services
             return true;
         }
 
-        private void ValidateTourDto(TourDto dto)
+        private void ValidateTourModel(TourModel model)
         {
-            if (dto == null)
-                throw new ArgumentNullException(nameof(dto));
+            if (model == null)
+                throw new ArgumentNullException(nameof(model));
 
-            if (string.IsNullOrWhiteSpace(dto.Name))
+            if (string.IsNullOrWhiteSpace(model.Name))
                 throw new BusinessValidationException("Tour name is required.");
 
-            if (!Enum.IsDefined(typeof(TypeTour), dto.Type))
+            if (!Enum.IsDefined(typeof(TypeTour), model.Type))
                 throw new BusinessValidationException("Invalid tour type.");
 
-            if (string.IsNullOrWhiteSpace(dto.Country))
+            if (string.IsNullOrWhiteSpace(model.Country))
                 throw new BusinessValidationException("Country is required.");
 
-            if (string.IsNullOrWhiteSpace(dto.Region))
+            if (string.IsNullOrWhiteSpace(model.Region))
                 throw new BusinessValidationException("Region is required.");
 
-            if (dto.StartDate.Date < DateTime.UtcNow.Date)
+            if (model.StartDate.Date < DateTime.UtcNow.Date)
                 throw new BusinessValidationException("Start date cannot be in the past.");
 
-            if (dto.EndDate.Date < dto.StartDate.Date)
+            if (model.EndDate.Date < model.StartDate.Date)
                 throw new BusinessValidationException("End date must be after the start date.");
 
-            if (dto.Price < 0)
+            if (model.Price < 0)
                 throw new BusinessValidationException("Price cannot be negative.");
         }
     }

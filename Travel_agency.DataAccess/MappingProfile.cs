@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
-using Travel_agency.Core.Models.Hotels;
-using Travel_agency.Core.Models.Tours;
-using Travel_agency.Core.Models.Transports;
-using Travel_agency.Core.Models.Users;
+using Travel_agency.Core.BusinessModels.Hotels;
+using Travel_agency.Core.BusinessModels.Tours;
+using Travel_agency.Core.BusinessModels.Transports;
+using Travel_agency.Core.BusinessModels.Users;
 using Travel_agency.DataAccess.Entities;
 
 namespace Travel_agency.DataAccess;
@@ -11,22 +11,22 @@ public class MappingProfile : Profile
 {
     public MappingProfile()
     {
-        CreateMap<HotelBookingEntity, HotelBookingDto>().ReverseMap();
-        CreateMap<HotelBookingEntity, HotelBookingDetailsDto>().ReverseMap();
-        CreateMap<HotelEntity, HotelDto>().ReverseMap();
-        CreateMap<HotelEntity, HotelWithBookingsDto>().ReverseMap();
-        CreateMap<HotelRoomEntity, HotelRoomDto>().ReverseMap();
-        CreateMap<HotelRoomEntity, HotelRoomWithBookingDto>().ReverseMap();
-        CreateMap<TicketBookingEntity, TicketBookingDto>().ReverseMap();
-        CreateMap<TicketBookingEntity, TicketBookingDetailsDto>().ReverseMap();
-        CreateMap<TourBookingEntity, TourBookingDto>().ReverseMap();
-        CreateMap<TourBookingEntity, TourBookingDetailsDto>().ReverseMap();
-        CreateMap<TourEntity, TourDto>().ReverseMap();
-        CreateMap<TourEntity, TourWithBookingsDto>().ReverseMap();
-        CreateMap<TransportEntity, TransportDto>().ReverseMap();
-        CreateMap<TransportEntity, TransportWithBookingsDto>().ReverseMap();
-        CreateMap<UserEntity, UserDto>().ReverseMap();
-        CreateMap<UserEntity, UserWithBookingsDto>().ReverseMap();
+        CreateMap<HotelBookingEntity, HotelBookingModel>().ReverseMap();
+        CreateMap<HotelBookingEntity, HotelBookingDetailsModel>().ReverseMap();
+        CreateMap<HotelEntity, HotelModel>().ReverseMap();
+        CreateMap<HotelEntity, HotelWithBookingsModel>().ReverseMap();
+        CreateMap<HotelRoomEntity, HotelRoomModel>().ReverseMap();
+        CreateMap<HotelRoomEntity, HotelRoomWithBookingModel>().ReverseMap();
+        CreateMap<TicketBookingEntity, TicketBookingModel>().ReverseMap();
+        CreateMap<TicketBookingEntity, TicketBookingDetailsModel>().ReverseMap();
+        CreateMap<TourBookingEntity, TourBookingModel>().ReverseMap();
+        CreateMap<TourBookingEntity, TourBookingDetailsModel>().ReverseMap();
+        CreateMap<TourEntity, TourModel>().ReverseMap();
+        CreateMap<TourEntity, TourWithBookingsModel>().ReverseMap();
+        CreateMap<TransportEntity, TransportModel>().ReverseMap();
+        CreateMap<TransportEntity, TransportWithBookingsModel>().ReverseMap();
+        CreateMap<UserEntity, UserModel>().ReverseMap();
+        CreateMap<UserEntity, UserWithBookingsModel>().ReverseMap();
 
     }
 }

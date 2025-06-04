@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Travel_agency.BLL.Services;
-using Travel_agency.Core.Models.Tours;
+using Travel_agency.Core.BusinessModels.Tours;
 using Travel_agency.DataAccess.Abstraction;
 using Travel_agency.DataAccess.Entities;
 using NSubstitute;
@@ -33,7 +33,7 @@ public class TourQueryServiceTests
         _unitOfWork.Tours.Returns(_tourRepository);
 
         // Налаштування AutoMapper для тестів
-        var mapperConfig = new MapperConfiguration(cfg => cfg.CreateMap<TourEntity, TourDto>());
+        var mapperConfig = new MapperConfiguration(cfg => cfg.CreateMap<TourEntity, TourModel>());
         _mapper = mapperConfig.CreateMapper();
     }
 
@@ -54,7 +54,7 @@ public class TourQueryServiceTests
         _tourRepository.GetAllToursAsync().Returns(Task.FromResult<IEnumerable<TourEntity>>(testTours));
 
         var sut = new TourQueryService(_unitOfWork, _mapper);
-        var filter = new TourFilterDto { Country = "italy" };
+        var filter = new TourFilterModel { Country = "italy" };
 
         // Act
         var result = await sut.GetFilteredToursAsync(filter);
@@ -70,7 +70,7 @@ public class TourQueryServiceTests
         _tourRepository.GetAllToursAsync().Returns(Task.FromResult<IEnumerable<TourEntity>>(testTours));
 
         var sut = new TourQueryService(_unitOfWork, _mapper);
-        var filter = new TourFilterDto { Type = TypeTour.Adventure };
+        var filter = new TourFilterModel { Type = TypeTour.Adventure };
 
         var result = await sut.GetFilteredToursAsync(filter);
 
@@ -85,7 +85,7 @@ public class TourQueryServiceTests
         _tourRepository.GetAllToursAsync().Returns(Task.FromResult<IEnumerable<TourEntity>>(testTours));
 
         var sut = new TourQueryService(_unitOfWork, _mapper);
-        var filter = new TourFilterDto
+        var filter = new TourFilterModel
         {
             StartDateFrom = new DateTime(2024, 8, 1),
             StartDateTo = new DateTime(2024, 9, 10),
