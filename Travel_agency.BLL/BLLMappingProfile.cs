@@ -5,11 +5,11 @@ using Travel_agency.Core.BusinessModels.Transports;
 using Travel_agency.Core.BusinessModels.Users;
 using Travel_agency.DataAccess.Entities;
 
-namespace Travel_agency.DataAccess;
+namespace Travel_agency.BLL;
 
-public class MappingProfile : Profile
+public class BLLMappingProfile : Profile
 {
-    public MappingProfile()
+    public BLLMappingProfile()
     {
         CreateMap<HotelBookingEntity, HotelBookingModel>().ReverseMap();
         CreateMap<HotelBookingEntity, HotelBookingDetailsModel>().ReverseMap();
@@ -27,6 +27,5 @@ public class MappingProfile : Profile
         CreateMap<TransportEntity, TransportWithBookingsModel>().ReverseMap();
         CreateMap<UserEntity, UserModel>().ReverseMap();
         CreateMap<UserEntity, UserWithBookingsModel>().ReverseMap();
-
     }
 }
