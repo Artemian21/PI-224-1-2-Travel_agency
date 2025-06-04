@@ -16,6 +16,5 @@ namespace Travel_agency.DataAccess.Abstraction
         Task<int> GetTotalToursCountAsync();
         Task<TourEntity> GetTourByIdAsync(Guid tourId);
         Task<TourEntity> UpdateTourAsync(TourEntity updatedTour);
-        IQueryable<TourEntity> AsQueryable();
     }
 }

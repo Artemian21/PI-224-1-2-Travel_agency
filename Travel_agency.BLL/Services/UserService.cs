@@ -34,6 +34,7 @@ namespace Travel_agency.BLL.Services
 
             userEntity.Role = role;
             await _unitOfWork.Users.UpdateUserAsync(userEntity);
+            await _unitOfWork.SaveChangesAsync();
             return true;
         }
 
@@ -46,6 +47,7 @@ namespace Travel_agency.BLL.Services
             }
 
             await _unitOfWork.Users.DeleteUserAsync(userId);
+            await _unitOfWork.SaveChangesAsync();
             return true;
         }
 
@@ -93,6 +95,7 @@ namespace Travel_agency.BLL.Services
                 throw new NotFoundException($"User with ID {updateModel.Id} not found.");
             }
 
+            await _unitOfWork.SaveChangesAsync();
             return _mapper.Map<UserModel>(updatedUserEntity);
         }
 

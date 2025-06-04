@@ -61,6 +61,8 @@ namespace Travel_agency.BLL.Services
 
             var tourEntity = _mapper.Map<TourEntity>(tourModel);
             var addedTourEntity = await _unitOfWork.Tours.AddTourAsync(tourEntity);
+
+            await _unitOfWork.SaveChangesAsync();
             return _mapper.Map<TourModel>(addedTourEntity);
         }
 
@@ -74,6 +76,7 @@ namespace Travel_agency.BLL.Services
             if (updatedTourEntity == null)
                 throw new NotFoundException($"Tour with ID {tourModel.Id} not found.");
 
+            await _unitOfWork.SaveChangesAsync();
             return _mapper.Map<TourModel>(updatedTourEntity);
         }
 
@@ -86,6 +89,8 @@ namespace Travel_agency.BLL.Services
             }
 
             await _unitOfWork.Tours.DeleteTourAsync(tourId);
+
+            await _unitOfWork.SaveChangesAsync();
             return true;
         }
 

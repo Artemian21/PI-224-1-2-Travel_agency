@@ -33,7 +33,6 @@ namespace Travel_agency.DataAccess.Repository
         public async Task<TransportEntity> AddTransportAsync(TransportEntity transport)
         {
             _context.Transports.Add(transport);
-            await _context.SaveChangesAsync();
             return transport;
         }
 
@@ -51,8 +50,6 @@ namespace Travel_agency.DataAccess.Repository
             existingTransport.ArrivalDate = updatedTransport.ArrivalDate;
             existingTransport.Price = updatedTransport.Price;
 
-            await _context.SaveChangesAsync();
-
             return existingTransport;
         }
 
@@ -62,7 +59,6 @@ namespace Travel_agency.DataAccess.Repository
             if (transport != null)
             {
                 _context.Transports.Remove(transport);
-                await _context.SaveChangesAsync();
             }
         }
     }

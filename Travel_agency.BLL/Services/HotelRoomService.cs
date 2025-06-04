@@ -59,6 +59,8 @@ namespace Travel_agency.BLL.Services
 
             var hotelRoomEntity = _mapper.Map<HotelRoomEntity>(hotelRoomModel);
             var addedHotelRoomEntity = await _unitOfWork.HotelRooms.AddHotelRoomAsync(hotelRoomEntity);
+
+            await _unitOfWork.SaveChangesAsync();
             return _mapper.Map<HotelRoomModel>(addedHotelRoomEntity);
         }
 
@@ -73,6 +75,8 @@ namespace Travel_agency.BLL.Services
                 throw new NotFoundException($"Hotel room with ID {hotelRoomModel.Id} not found.");
             }
 
+            await _unitOfWork.SaveChangesAsync();
+
             return _mapper.Map<HotelRoomModel>(updatedHotelRoomEntity);
         }
 
@@ -85,6 +89,8 @@ namespace Travel_agency.BLL.Services
             }
 
             await _unitOfWork.HotelRooms.DeleteHotelRoomAsync(hotelRoomId);
+
+            await _unitOfWork.SaveChangesAsync();
             return true;
         }
 

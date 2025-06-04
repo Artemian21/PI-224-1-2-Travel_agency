@@ -45,6 +45,8 @@ namespace Travel_agency.BLL.Services
 
             var transportEntity = _mapper.Map<TransportEntity>(transportModel);
             var addedTransportEntity = await _unitOfWork.Transports.AddTransportAsync(transportEntity);
+
+            await _unitOfWork.SaveChangesAsync();
             return _mapper.Map<TransportModel>(addedTransportEntity);
         }
 
@@ -58,6 +60,7 @@ namespace Travel_agency.BLL.Services
             if (updatedTransportEntity == null)
                 throw new NotFoundException($"Transport with ID {transportModel.Id} not found.");
 
+            await _unitOfWork.SaveChangesAsync();
             return _mapper.Map<TransportModel>(updatedTransportEntity);
         }
 
@@ -70,6 +73,7 @@ namespace Travel_agency.BLL.Services
             }
 
             await _unitOfWork.Transports.DeleteTransportAsync(transportId);
+            await _unitOfWork.SaveChangesAsync();
             return true;
         }
 

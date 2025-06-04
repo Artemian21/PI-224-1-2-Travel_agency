@@ -47,6 +47,7 @@ namespace Travel_agency.BLL.Services
 
             var hotelBookingEntity = _mapper.Map<HotelBookingEntity>(hotelBookingModel);
             var addedHotelBookingEntity = await _unitOfWork.HotelBookings.AddHotelBookingAsync(hotelBookingEntity);
+            await _unitOfWork.SaveChangesAsync();
             return _mapper.Map<HotelBookingModel>(addedHotelBookingEntity);
         }
 
@@ -61,6 +62,8 @@ namespace Travel_agency.BLL.Services
                 throw new NotFoundException($"Hotel booking with ID {hotelBookingModel.Id} not found.");
             }
 
+            await _unitOfWork.SaveChangesAsync();
+
             return _mapper.Map<HotelBookingModel>(updatedHotelBookingEntity);
         }
 
@@ -73,6 +76,8 @@ namespace Travel_agency.BLL.Services
             }
 
             await _unitOfWork.HotelBookings.DeleteHotelBookingAsync(hotelBookingId);
+
+            await _unitOfWork.SaveChangesAsync();
             return true;
         }
 

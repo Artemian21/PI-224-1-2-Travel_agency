@@ -46,6 +46,8 @@ namespace Travel_agency.BLL.Services
 
             var ticketBookingEntity = _mapper.Map<TicketBookingEntity>(ticketBookingModel);
             var addedTicketBookingEntity = await _unitOfWork.TicketBookings.AddTicketBookingAsync(ticketBookingEntity);
+
+            await _unitOfWork.SaveChangesAsync();
             return _mapper.Map<TicketBookingModel>(addedTicketBookingEntity);
         }
 
@@ -58,8 +60,8 @@ namespace Travel_agency.BLL.Services
             if (updatedTicketBookingEntity == null)
                 throw new NotFoundException($"Ticket Booking with ID {ticketBookingModel.Id} not found.");
 
-
-            return updatedTicketBookingEntity == null ? null : _mapper.Map<TicketBookingModel>(updatedTicketBookingEntity);
+            await _unitOfWork.SaveChangesAsync();
+            return _mapper.Map<TicketBookingModel>(updatedTicketBookingEntity);
         }
 
         public async Task<bool> DeleteTicketBookingAsync(Guid ticketBookingId)
@@ -71,6 +73,7 @@ namespace Travel_agency.BLL.Services
             }
 
             await _unitOfWork.TicketBookings.DeleteTicketBookingAsync(ticketBookingId);
+            await _unitOfWork.SaveChangesAsync();
             return true;
         }
 

@@ -17,14 +17,14 @@ namespace Travel_agency.BLL.Services
 {
     public class AuthService : IAuthService
     {
-        private readonly IUserRepository _userRepository;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IPasswordHasher _passwordHasher;
         private readonly IJWTProvider _jwtProvider;
         private readonly IMapper _mapper;
 
-        public AuthService(IUserRepository userRepository, IPasswordHasher passwordHasher, IJWTProvider jwtProvider, IMapper mapper)
+        public AuthService(IUnitOfWork unitOfWork, IPasswordHasher passwordHasher, IJWTProvider jwtProvider, IMapper mapper)
         {
-            _userRepository = userRepository;
+            _unitOfWork = unitOfWork;
             _passwordHasher = passwordHasher;
             _jwtProvider = jwtProvider;
             _mapper = mapper;
@@ -35,7 +35,7 @@ namespace Travel_agency.BLL.Services
             if (register == null)
                 throw new ArgumentNullException(nameof(register), "Register data cannot be null");
 
-            var existingByEmail = await _userRepository.GetUserByEmailAsync(register.Email);
+            var existingByEmail = await _unitOfWork.Users.GetUserByEmailAsync(register.Email);
             if (existingByEmail != null)
                 throw new ConflictException("Email is already in use");
 
@@ -53,7 +53,8 @@ namespace Travel_agency.BLL.Services
                 Role = UserRole.Registered
             };
 
-            var addedUser = await _userRepository.AddUserAsync(userEntity);
+            var addedUser = await _unitOfWork.Users.AddUserAsync(userEntity);
+            await _unitOfWork.SaveChangesAsync();
             return _mapper.Map<UserModel>(addedUser);
         }
 
@@ -62,7 +63,8 @@ namespace Travel_agency.BLL.Services
             if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
                 throw new BusinessValidationException("Email and password must not be empty");
 
-            var userEntity = await _userRepository.GetUserByEmailAsync(email);
+            var userEntity = await _unitOfWork.Users.GetUserByEmailAsync(email);
+
             if (userEntity == null)
                 throw new NotFoundException("User not found");
 
