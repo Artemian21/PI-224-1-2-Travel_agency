@@ -34,9 +34,9 @@ namespace Travel_agency.PL.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Login([FromBody] LoginRequest login)
         {
-            var token = await _authService.Login(login.Email, login.Password);
+            var (token, user) = await _authService.Login(login.Email, login.Password);
 
-            return Ok(new { Token = token });
+            return Ok(new { Token = token, User = _mapper.Map<UserResponse>(user) });
         }
     }
 }

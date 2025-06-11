@@ -58,7 +58,7 @@ namespace Travel_agency.BLL.Services
             return _mapper.Map<UserModel>(addedUser);
         }
 
-        public async Task<string> Login(string email, string password)
+        public async Task<(string, UserModel)> Login(string email, string password)
         {
             if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
                 throw new BusinessValidationException("Email and password must not be empty");
@@ -72,7 +72,8 @@ namespace Travel_agency.BLL.Services
                 throw new UnauthorizedAccessException("Invalid password");
 
             var userModel = _mapper.Map<UserModel>(userEntity);
-            return _jwtProvider.GenerateToken(userModel);
+            var token = _jwtProvider.GenerateToken(userModel);
+            return (token, userModel);
         }
 
         private bool IsPasswordStrong(string password)

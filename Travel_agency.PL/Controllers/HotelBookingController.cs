@@ -92,6 +92,10 @@ namespace Travel_agency.PL.Controllers
                 return BadRequest("Hotel booking data is null.");
             }
 
+            var existingBooking = await _hotelBookingService.GetHotelBookingByIdAsync(id);
+            if (existingBooking == null)
+                return NotFound();
+
             var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
             if (userIdClaim == null)
             {
@@ -102,7 +106,7 @@ namespace Travel_agency.PL.Controllers
 
             var hotelBookingModel = _mapper.Map<HotelBookingModel>(hotelBooking);
             hotelBookingModel.Id = id;
-            hotelBookingModel.UserId = userId;
+            hotelBookingModel.UserId = existingBooking.UserId;
 
             var updatedBooking = await _hotelBookingService.UpdateHotelBookingAsync(hotelBookingModel);
             if (updatedBooking == null)

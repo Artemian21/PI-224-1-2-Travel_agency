@@ -95,6 +95,12 @@ namespace Travel_agency.PL.Controllers
                 return BadRequest("Ticket booking data is null.");
             }
 
+            var existingBooking = await _ticketBookingService.GetTicketBookingByIdAsync(id);
+            if (existingBooking == null)
+            {
+                return NotFound();
+            }
+
             var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
             if (userIdClaim == null)
             {
@@ -105,7 +111,7 @@ namespace Travel_agency.PL.Controllers
 
             var ticketBookingModel = _mapper.Map<TicketBookingModel>(ticketBooking);
             ticketBookingModel.Id = id;
-            ticketBookingModel.UserId = userId;
+            ticketBookingModel.UserId = existingBooking.UserId;
 
 
             var updatedBooking = await _ticketBookingService.UpdateTicketBookingAsync(ticketBookingModel);

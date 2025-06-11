@@ -90,6 +90,12 @@ namespace Travel_agency.PL.Controllers
                 return BadRequest("Tour booking data is null.");
             }
 
+            var existingBooking = await _tourBookingService.GetTourBookingByIdAsync(id);
+            if (existingBooking == null)
+            {
+                return NotFound();
+            }
+
             var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
             if (userIdClaim == null)
             {
@@ -100,7 +106,7 @@ namespace Travel_agency.PL.Controllers
 
             var tourBookingModel = _mapper.Map<TourBookingModel>(tourBooking);
             tourBookingModel.Id = id;
-            tourBookingModel.UserId = userId;
+            tourBookingModel.UserId = existingBooking.UserId;
 
             var updatedBooking = await _tourBookingService.UpdateTourBookingAsync(tourBookingModel);
             if (updatedBooking == null)

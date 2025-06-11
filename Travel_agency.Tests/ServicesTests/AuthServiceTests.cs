@@ -140,9 +140,10 @@ public class AuthServiceTests
         _jwtProvider.GenerateToken(userModel).Returns(token);
 
         // Act
-        var result = await _authService.Login(user.Email, "ValidPass1!");
+        var (actualToken, actualUser) = await _authService.Login(user.Email, "ValidPass1!");
 
         // Assert
-        Assert.Equal(token, result);
+        Assert.Equal(token, actualToken);
+        Assert.Equal(userModel, actualUser);
     }
 }
