@@ -18,7 +18,7 @@ using Travel_agency.BLL;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<TravelAgencyDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("LocalConnection"))); // Use Local or Default connection string 
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))); // Use Local or Default connection string 
 
 builder.Services.AddScoped<IHotelBookingRepository, HotelBookingRepository>();
 builder.Services.AddScoped<IHotelRepository, HotelRepository>();
@@ -91,6 +91,17 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
     });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend",
+        builder =>
+        {
+            builder.WithOrigins("http://localhost:3000")
+                   .AllowAnyHeader()
+                   .AllowAnyMethod();
+        });
+});
+
 builder.Services.AddAuthorization();
 
 builder.Services.AddControllers()
@@ -151,6 +162,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors("AllowFrontend");
 
 app.UseAuthentication();
 
