@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useMutation } from 'react-query'
+import { useMutation, useQueryClient } from 'react-query'
 import { useAuth } from '../../contexts/AuthContext'
 import { useNavigate } from 'react-router-dom'
 import { ticketBookingAPI } from '../../services/api'
@@ -10,13 +10,14 @@ const TransportCard = ({ transport }) => {
   const { isAuthenticated } = useAuth()
   const navigate = useNavigate()
   const [isBooking, setIsBooking] = useState(false)
+  const queryClient = useQueryClient()
 
   const bookingMutation = useMutation(
     (transportId) =>
       ticketBookingAPI.create({ transportId, status: 'Pending' }),
     {
       onSuccess: () => {
-        alert('Ticket successfully booked!')
+        queryClient.invalidateQueries(['user-tour-bookings'])
         navigate('/profile')
       },
       onError: () => {
