@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useMutation } from 'react-query'
+import { useMutation, useQueryClient } from 'react-query'
 import { useAuth } from '../../contexts/AuthContext'
 import { useNavigate } from 'react-router-dom'
 import { hotelBookingAPI } from '../../services/api'
@@ -11,6 +11,7 @@ const RoomCard = ({ room, hotelName }) => {
   const { isAuthenticated } = useAuth()
   const navigate = useNavigate()
   const [showBookingForm, setShowBookingForm] = useState(false)
+  const queryClient = useQueryClient()
 
   const {
     register,
@@ -22,7 +23,7 @@ const RoomCard = ({ room, hotelName }) => {
     (bookingData) => hotelBookingAPI.create(bookingData),
     {
       onSuccess: () => {
-        alert('Room successfully booked!')
+        queryClient.invalidateQueries(['user-tour-bookings'])
         setShowBookingForm(false)
         navigate('/profile')
       },

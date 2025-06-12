@@ -1,6 +1,6 @@
 import React from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { useQuery, useMutation } from 'react-query'
+import { useQuery, useMutation, useQueryClient } from 'react-query'
 import { tourAPI, tourBookingAPI } from '../../services/api'
 import { useAuth } from '../../contexts/AuthContext'
 import { formatDate, formatPrice } from '../../utils/formatters'
@@ -12,6 +12,7 @@ const TourDetail = () => {
   const { id } = useParams()
   const navigate = useNavigate()
   const { isAuthenticated } = useAuth()
+  const queryClient = useQueryClient()
 
   const { data: tour, isLoading, error } = useQuery(
     ['tour', id],
@@ -25,7 +26,7 @@ const TourDetail = () => {
     (tourId) => tourBookingAPI.create({ tourId, status: 'Pending' }),
     {
       onSuccess: () => {
-        alert('Tour successfully booked!')
+        queryClient.invalidateQueries(['user-tour-bookings'])
         navigate('/profile')
       },
       onError: () => {
