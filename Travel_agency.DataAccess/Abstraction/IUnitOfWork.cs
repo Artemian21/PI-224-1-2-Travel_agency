@@ -1,7 +1,7 @@
-﻿namespace Travel_agency.DataAccess.Abstraction;
-
-public interface IUnitOfWork
+﻿namespace Travel_agency.DataAccess.Abstraction
 {
+    public interface IUnitOfWork
+    {
         IHotelBookingRepository HotelBookings { get; }
         IHotelRoomRepository HotelRooms { get; }
         IHotelRepository Hotels { get; }
@@ -13,4 +13,5 @@ public interface IUnitOfWork
 
         void Dispose();
         Task SaveChangesAsync();
+    }
 }

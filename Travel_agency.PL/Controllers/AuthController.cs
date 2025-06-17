@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Travel_agency.BLL.Abstractions;
-using Travel_agency.Core.Models.Users;
+using Travel_agency.Core.BusinessModels.Users;
 using Travel_agency.PL.Models.Requests;
 using Travel_agency.PL.Models.Responses;
 
@@ -24,9 +24,9 @@ namespace Travel_agency.PL.Controllers
 
         [HttpPost("register")]
         [AllowAnonymous]
-        public async Task<IActionResult> Register([FromBody] RegisterUserRequest registerDto)
+        public async Task<IActionResult> Register([FromBody] RegisterUserRequest register)
         {
-            var user = await _authService.Register(_mapper.Map<RegisterUserDto>(registerDto));
+            var user = await _authService.Register(_mapper.Map<RegisterUserModel>(register));
             return Ok(_mapper.Map<UserResponse>(user));
         }
 
@@ -34,9 +34,9 @@ namespace Travel_agency.PL.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Login([FromBody] LoginRequest login)
         {
-            var token = await _authService.Login(login.Email, login.Password);
+            var (token, user) = await _authService.Login(login.Email, login.Password);
 
-            return Ok(new { Token = token });
+            return Ok(new { Token = token, User = _mapper.Map<UserResponse>(user) });
         }
     }
 }

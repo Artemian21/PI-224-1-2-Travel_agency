@@ -33,7 +33,6 @@ namespace Travel_agency.DataAccess.Repository
         public async Task<HotelEntity> AddHotelAsync(HotelEntity hotel)
         {
             await _context.Hotels.AddAsync(hotel);
-            await _context.SaveChangesAsync();
             return hotel;
         }
 
@@ -50,8 +49,6 @@ namespace Travel_agency.DataAccess.Repository
             existingHotel.Address = updatedHotel.Address;
             existingHotel.Country = updatedHotel.Country;
 
-            await _context.SaveChangesAsync();
-
             return existingHotel;
         }
 
@@ -61,7 +58,6 @@ namespace Travel_agency.DataAccess.Repository
             if (hotel != null)
             {
                 _context.Hotels.Remove(hotel);
-                await _context.SaveChangesAsync();
             }
         }
     }

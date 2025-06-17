@@ -4,8 +4,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Travel_agency.BLL.Abstractions;
-using Travel_agency.Core.Models;
-using Travel_agency.Core.Models.Tours;
+using Travel_agency.Core.BusinessModels;
+using Travel_agency.Core.BusinessModels.Tours;
 using Travel_agency.PL.Models.Requests;
 using Travel_agency.PL.Models.Responses;
 
@@ -75,10 +75,10 @@ namespace Travel_agency.PL.Controllers
 
             var userId = Guid.Parse(userIdClaim.Value);
 
-            var tourBookingDto = _mapper.Map<TourBookingDto>(tourBooking);
-            tourBookingDto.UserId = userId;
+            var tourBookingModel = _mapper.Map<TourBookingModel>(tourBooking);
+            tourBookingModel.UserId = userId;
 
-            var createdBooking = await _tourBookingService.AddTourBookingAsync(tourBookingDto);
+            var createdBooking = await _tourBookingService.AddTourBookingAsync(tourBookingModel);
             return Ok(_mapper.Map<TourBookingResponse>(createdBooking));
         }
 
@@ -90,6 +90,12 @@ namespace Travel_agency.PL.Controllers
                 return BadRequest("Tour booking data is null.");
             }
 
+            var existingBooking = await _tourBookingService.GetTourBookingByIdAsync(id);
+            if (existingBooking == null)
+            {
+                return NotFound();
+            }
+
             var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
             if (userIdClaim == null)
             {
@@ -98,11 +104,11 @@ namespace Travel_agency.PL.Controllers
 
             var userId = Guid.Parse(userIdClaim.Value);
 
-            var tourBookingDto = _mapper.Map<TourBookingDto>(tourBooking);
-            tourBookingDto.Id = id;
-            tourBookingDto.UserId = userId;
+            var tourBookingModel = _mapper.Map<TourBookingModel>(tourBooking);
+            tourBookingModel.Id = id;
+            tourBookingModel.UserId = existingBooking.UserId;
 
-            var updatedBooking = await _tourBookingService.UpdateTourBookingAsync(tourBookingDto);
+            var updatedBooking = await _tourBookingService.UpdateTourBookingAsync(tourBookingModel);
             if (updatedBooking == null)
             {
                 return NotFound();

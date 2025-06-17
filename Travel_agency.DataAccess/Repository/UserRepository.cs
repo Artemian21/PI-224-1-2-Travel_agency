@@ -29,18 +29,19 @@ namespace Travel_agency.DataAccess.Repository
 
         public async Task<IEnumerable<UserEntity>> GetAllUsers()
         {
-            return await _context.Users.AsNoTracking().ToListAsync();
+            return await _context.Users.AsNoTracking()
+                .ToListAsync();
         }
 
         public async Task<UserEntity?> GetUserByEmailAsync(string email)
         {
-            return await _context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Email == email);
+            return await _context.Users.AsNoTracking()
+                .FirstOrDefaultAsync(u => u.Email == email);
         }
 
         public async Task<UserEntity> AddUserAsync(UserEntity user)
         {
             _context.Users.Add(user);
-            await _context.SaveChangesAsync();
             return user;
         }
 
@@ -56,8 +57,6 @@ namespace Travel_agency.DataAccess.Repository
             existingUser.Email = updatedUser.Email;
             existingUser.Role = updatedUser.Role;
 
-            await _context.SaveChangesAsync();
-
             return existingUser;
         }
 
@@ -67,7 +66,6 @@ namespace Travel_agency.DataAccess.Repository
             if (user != null)
             {
                 _context.Users.Remove(user);
-                await _context.SaveChangesAsync();
             }
         }
 

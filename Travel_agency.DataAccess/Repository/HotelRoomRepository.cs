@@ -41,7 +41,6 @@ namespace Travel_agency.DataAccess.Repository
         public async Task<HotelRoomEntity> AddHotelRoomAsync(HotelRoomEntity hotelRoom)
         {
             await _context.HotelRooms.AddAsync(hotelRoom);
-            await _context.SaveChangesAsync();
             return hotelRoom;
         }
 
@@ -58,8 +57,6 @@ namespace Travel_agency.DataAccess.Repository
             existingHotelRoom.Capacity = updatedHotelRoom.Capacity;
             existingHotelRoom.HotelId = updatedHotelRoom.HotelId;
 
-            await _context.SaveChangesAsync();
-
             return existingHotelRoom;
         }
 
@@ -69,7 +66,6 @@ namespace Travel_agency.DataAccess.Repository
             if (hotelRoom != null)
             {
                 _context.HotelRooms.Remove(hotelRoom);
-                await _context.SaveChangesAsync();
             }
         }
     }

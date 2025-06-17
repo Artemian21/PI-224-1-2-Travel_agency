@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using Travel_agency.BLL.Abstractions;
-using Travel_agency.Core.Models;
-using Travel_agency.Core.Models.Hotels;
+using Travel_agency.Core.BusinessModels;
+using Travel_agency.Core.BusinessModels.Hotels;
 using Travel_agency.PL.Models.Requests;
 using Travel_agency.PL.Models.Responses;
 
@@ -62,9 +62,9 @@ namespace Travel_agency.PL.Controllers
                 return BadRequest("Invalid hotel room data");
             }
 
-            var hotelRoomDto = _mapper.Map<HotelRoomDto>(hotelRoom);
+            var hotelRoomModel = _mapper.Map<HotelRoomModel>(hotelRoom);
 
-            var createdHotelRoom = await _hotelRoomService.AddHotelRoomAsync(hotelRoomDto);
+            var createdHotelRoom = await _hotelRoomService.AddHotelRoomAsync(hotelRoomModel);
             return Ok(_mapper.Map<HotelRoomResponse>(createdHotelRoom));
         }
 
@@ -77,10 +77,10 @@ namespace Travel_agency.PL.Controllers
                 return BadRequest("Invalid hotel room data");
             }
 
-            var hotelRoomDto = _mapper.Map<HotelRoomDto>(hotelRoom);
-            hotelRoomDto.Id = id;
+            var hotelRoomModel = _mapper.Map<HotelRoomModel>(hotelRoom);
+            hotelRoomModel.Id = id;
 
-            var updatedHotelRoom = await _hotelRoomService.UpdateHotelRoomAsync(hotelRoomDto);
+            var updatedHotelRoom = await _hotelRoomService.UpdateHotelRoomAsync(hotelRoomModel);
             if (updatedHotelRoom == null)
             {
                 return NotFound();

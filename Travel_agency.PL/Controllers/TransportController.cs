@@ -5,8 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 using System.Security.Cryptography.Xml;
 using Travel_agency.BLL.Abstractions;
 using Travel_agency.BLL.Services;
-using Travel_agency.Core.Models;
-using Travel_agency.Core.Models.Transports;
+using Travel_agency.Core.BusinessModels;
+using Travel_agency.Core.BusinessModels.Transports;
 using Travel_agency.PL.Models.Requests;
 using Travel_agency.PL.Models.Responses;
 
@@ -54,9 +54,9 @@ namespace Travel_agency.PL.Controllers
                 return BadRequest("Transport data is null.");
             }
 
-            var transportDto = _mapper.Map<TransportDto>(transport);
+            var transportModel = _mapper.Map<TransportModel>(transport);
 
-            var createdTransport = await _transportService.AddTransportAsync(transportDto);
+            var createdTransport = await _transportService.AddTransportAsync(transportModel);
             return Ok(_mapper.Map<TransportResponse>(createdTransport));
         }
 
@@ -69,10 +69,10 @@ namespace Travel_agency.PL.Controllers
                 return BadRequest("Transport data is null.");
             }
 
-            var transportDto = _mapper.Map<TransportDto>(transport);
-            transportDto.Id = id;
+            var transportModel = _mapper.Map<TransportModel>(transport);
+            transportModel.Id = id;
 
-            var updatedTransport = await _transportService.UpdateTransportAsync(transportDto);
+            var updatedTransport = await _transportService.UpdateTransportAsync(transportModel);
             if (updatedTransport == null)
             {
                 return NotFound();

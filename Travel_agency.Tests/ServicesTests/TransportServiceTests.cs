@@ -4,7 +4,7 @@ using AutoMapper;
 using NSubstitute;
 using Travel_agency.BLL.Services;
 using Travel_agency.Core.Exceptions;
-using Travel_agency.Core.Models.Transports;
+using Travel_agency.Core.BusinessModels.Transports;
 using Travel_agency.DataAccess.Abstraction;
 using Travel_agency.DataAccess.Entities;
 
@@ -32,36 +32,36 @@ namespace Travel_agency.Tests.ServicesTests;
         }
 
         [Fact]
-        public async Task GetAllTransportsAsync_ReturnsMappedTransportDtos()
+        public async Task GetAllTransportsAsync_ReturnsMappedTransportModels()
         {
             // Arrange
             var entities = _fixture.CreateMany<TransportEntity>();
-            var dtos = _fixture.CreateMany<TransportDto>();
+            var models = _fixture.CreateMany<TransportModel>();
             _unitOfWork.Transports.GetAllTransportsAsync().Returns(entities);
-            _mapper.Map<IEnumerable<TransportDto>>(entities).Returns(dtos);
+            _mapper.Map<IEnumerable<TransportModel>>(entities).Returns(models);
 
             // Act
             var result = await _service.GetAllTransportsAsync();
 
             // Assert
-            Assert.Equal(dtos, result);
+            Assert.Equal(models, result);
         }
 
         [Fact]
-        public async Task GetTransportByIdAsync_ValidId_ReturnsDto()
+        public async Task GetTransportByIdAsync_ValidId_ReturnsModel()
         {
             // Arrange
             var id = Guid.NewGuid();
             var entity = _fixture.Create<TransportEntity>();
-            var dto = _fixture.Create<TransportWithBookingsDto>();
+            var model = _fixture.Create<TransportWithBookingsModel>();
             _unitOfWork.Transports.GetTransportByIdAsync(id).Returns(entity);
-            _mapper.Map<TransportWithBookingsDto>(entity).Returns(dto);
+            _mapper.Map<TransportWithBookingsModel>(entity).Returns(model);
 
             // Act
             var result = await _service.GetTransportByIdAsync(id);
 
             // Assert
-            Assert.Equal(dto, result);
+            Assert.Equal(model, result);
         }
 
         [Fact]
@@ -73,9 +73,9 @@ namespace Travel_agency.Tests.ServicesTests;
         }
 
         [Fact]
-        public async Task AddTransportAsync_ValidTransport_ReturnsMappedDto()
+        public async Task AddTransportAsync_ValidTransport_ReturnsMappedModel()
         {
-            var dto = _fixture.Build<TransportDto>()
+            var model = _fixture.Build<TransportModel>()
                 .With(x => x.DepartureDate, DateTime.UtcNow.AddDays(1))
                 .With(x => x.ArrivalDate, DateTime.UtcNow.AddDays(2))
                 .With(x => x.Price, 100)
@@ -85,15 +85,15 @@ namespace Travel_agency.Tests.ServicesTests;
 
             var entity = _fixture.Create<TransportEntity>();
             var savedEntity = _fixture.Create<TransportEntity>();
-            var resultDto = _fixture.Create<TransportDto>();
+            var resultModel = _fixture.Create<TransportModel>();
 
-            _mapper.Map<TransportEntity>(dto).Returns(entity);
+            _mapper.Map<TransportEntity>(model).Returns(entity);
             _unitOfWork.Transports.AddTransportAsync(entity).Returns(savedEntity);
-            _mapper.Map<TransportDto>(savedEntity).Returns(resultDto);
+            _mapper.Map<TransportModel>(savedEntity).Returns(resultModel);
 
-            var result = await _service.AddTransportAsync(dto);
+            var result = await _service.AddTransportAsync(model);
 
-            Assert.Equal(resultDto, result);
+            Assert.Equal(resultModel, result);
         }
 
         [Theory]
@@ -102,12 +102,12 @@ namespace Travel_agency.Tests.ServicesTests;
         [InlineData(100, "Company", "", true, true)]
         [InlineData(100, "Company", "Bus", false, true)]
         [InlineData(100, "Company", "Bus", true, false)]
-        public async Task AddTransportAsync_InvalidDto_ThrowsBusinessValidationException(decimal price, string company, string type, bool futureDeparture, bool arrivalAfterDeparture)
+        public async Task AddTransportAsync_InvalidModel_ThrowsBusinessValidationException(decimal price, string company, string type, bool futureDeparture, bool arrivalAfterDeparture)
         {
             var departure = futureDeparture ? DateTime.UtcNow.AddDays(1) : DateTime.UtcNow.AddDays(-1);
             var arrival = arrivalAfterDeparture ? departure.AddHours(1) : departure.AddHours(-1);
 
-            var dto = new TransportDto
+            var model = new TransportModel
             {
                 Price = price,
                 Company = company,
@@ -116,13 +116,13 @@ namespace Travel_agency.Tests.ServicesTests;
                 ArrivalDate = arrival
             };
 
-            await Assert.ThrowsAsync<BusinessValidationException>(() => _service.AddTransportAsync(dto));
+            await Assert.ThrowsAsync<BusinessValidationException>(() => _service.AddTransportAsync(model));
         }
 
         [Fact]
-        public async Task UpdateTransportAsync_ValidTransport_ReturnsMappedDto()
+        public async Task UpdateTransportAsync_ValidTransport_ReturnsMappedModel()
         {
-            var dto = _fixture.Build<TransportDto>()
+            var model = _fixture.Build<TransportModel>()
                 .With(x => x.DepartureDate, DateTime.UtcNow.AddDays(1))
                 .With(x => x.ArrivalDate, DateTime.UtcNow.AddDays(2))
                 .With(x => x.Price, 100)
@@ -132,21 +132,21 @@ namespace Travel_agency.Tests.ServicesTests;
 
             var entity = _fixture.Create<TransportEntity>();
             var updatedEntity = _fixture.Create<TransportEntity>();
-            var resultDto = _fixture.Create<TransportDto>();
+            var resultModel = _fixture.Create<TransportModel>();
 
-            _mapper.Map<TransportEntity>(dto).Returns(entity);
+            _mapper.Map<TransportEntity>(model).Returns(entity);
             _unitOfWork.Transports.UpdateTransportAsync(entity).Returns(updatedEntity);
-            _mapper.Map<TransportDto>(updatedEntity).Returns(resultDto);
+            _mapper.Map<TransportModel>(updatedEntity).Returns(resultModel);
 
-            var result = await _service.UpdateTransportAsync(dto);
+            var result = await _service.UpdateTransportAsync(model);
 
-            Assert.Equal(resultDto, result);
+            Assert.Equal(resultModel, result);
         }
 
         [Fact]
         public async Task UpdateTransportAsync_TransportNotFound_ThrowsNotFoundException()
         {
-            var dto = _fixture.Build<TransportDto>()
+            var model = _fixture.Build<TransportModel>()
                 .With(x => x.DepartureDate, DateTime.UtcNow.AddDays(1))
                 .With(x => x.ArrivalDate, DateTime.UtcNow.AddDays(2))
                 .With(x => x.Price, 100)
@@ -155,10 +155,10 @@ namespace Travel_agency.Tests.ServicesTests;
                 .Create();
 
             var entity = _fixture.Create<TransportEntity>();
-            _mapper.Map<TransportEntity>(dto).Returns(entity);
+            _mapper.Map<TransportEntity>(model).Returns(entity);
             _unitOfWork.Transports.UpdateTransportAsync(entity).Returns((TransportEntity)null);
 
-            await Assert.ThrowsAsync<NotFoundException>(() => _service.UpdateTransportAsync(dto));
+            await Assert.ThrowsAsync<NotFoundException>(() => _service.UpdateTransportAsync(model));
         }
 
         [Fact]

@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Travel_agency.BLL.Abstractions;
 using Travel_agency.Core.Exceptions;
-using Travel_agency.Core.Models.Hotels;
+using Travel_agency.Core.BusinessModels.Hotels;
 using Travel_agency.DataAccess.Abstraction;
 using Travel_agency.DataAccess.Entities;
 
@@ -23,40 +23,43 @@ namespace Travel_agency.BLL.Services
             this._mapper = mapper;
         }
 
-        public async Task<IEnumerable<HotelDto>> GetAllHotelsAsync()
+        public async Task<IEnumerable<HotelModel>> GetAllHotelsAsync()
         {
             var hotelEntities = await _unitOfWork.Hotels.GetAllHotelsAsync();
-            return _mapper.Map<IEnumerable<HotelDto>>(hotelEntities);
+            return _mapper.Map<IEnumerable<HotelModel>>(hotelEntities);
         }
 
-        public async Task<HotelWithBookingsDto?> GetHotelByIdAsync(Guid hotelId)
+        public async Task<HotelWithBookingsModel?> GetHotelByIdAsync(Guid hotelId)
         {
             var hotelEntity = await _unitOfWork.Hotels.GetHotelByIdAsync(hotelId);
             if (hotelEntity == null)
                 throw new NotFoundException($"Hotel with ID {hotelId} not found.");
 
-            return _mapper.Map<HotelWithBookingsDto>(hotelEntity);
+            return _mapper.Map<HotelWithBookingsModel>(hotelEntity);
         }
 
-        public async Task<HotelDto> AddHotelAsync(HotelDto hotelDto)
+        public async Task<HotelModel> AddHotelAsync(HotelModel hotelModel)
         {
-            ValidateHotelDto(hotelDto);
+            ValidateHotelModel(hotelModel);
 
-            var hotelEntity = _mapper.Map<HotelEntity>(hotelDto);
+            var hotelEntity = _mapper.Map<HotelEntity>(hotelModel);
             var addedHotelEntity = await _unitOfWork.Hotels.AddHotelAsync(hotelEntity);
-            return _mapper.Map<HotelDto>(addedHotelEntity);
+
+            await _unitOfWork.SaveChangesAsync();
+            return _mapper.Map<HotelModel>(addedHotelEntity);
         }
 
-        public async Task<HotelDto> UpdateHotelAsync(HotelDto hotelDto)
+        public async Task<HotelModel> UpdateHotelAsync(HotelModel hotelModel)
         {
-            ValidateHotelDto(hotelDto);
+            ValidateHotelModel(hotelModel);
 
-            var hotelEntity = _mapper.Map<HotelEntity>(hotelDto);
+            var hotelEntity = _mapper.Map<HotelEntity>(hotelModel);
             var updatedHotelEntity = await _unitOfWork.Hotels.UpdateHotelAsync(hotelEntity);
             if (updatedHotelEntity == null)
-                throw new NotFoundException($"Hotel with ID {hotelDto.Id} not found.");
+                throw new NotFoundException($"Hotel with ID {hotelModel.Id} not found.");
 
-            return _mapper.Map<HotelDto>(updatedHotelEntity);
+            await _unitOfWork.SaveChangesAsync();
+            return _mapper.Map<HotelModel>(updatedHotelEntity);
         }
 
         public async Task<bool> DeleteHotelAsync(Guid hotelId)
@@ -68,24 +71,25 @@ namespace Travel_agency.BLL.Services
             }
 
             await _unitOfWork.Hotels.DeleteHotelAsync(hotelId);
+            await _unitOfWork.SaveChangesAsync();
             return true;
         }
 
-        private void ValidateHotelDto(HotelDto dto)
+        private void ValidateHotelModel(HotelModel model)
         {
-            if (dto == null)
-                throw new ArgumentNullException(nameof(dto), "Hotel object cannot be null.");
+            if (model == null)
+                throw new ArgumentNullException(nameof(model), "Hotel object cannot be null.");
 
-            if (string.IsNullOrWhiteSpace(dto.Name))
+            if (string.IsNullOrWhiteSpace(model.Name))
                 throw new BusinessValidationException("Hotel name is required.");
 
-            if (string.IsNullOrWhiteSpace(dto.Country))
+            if (string.IsNullOrWhiteSpace(model.Country))
                 throw new BusinessValidationException("Country is required.");
 
-            if (string.IsNullOrWhiteSpace(dto.City))
+            if (string.IsNullOrWhiteSpace(model.City))
                 throw new BusinessValidationException("City is required.");
 
-            if (string.IsNullOrWhiteSpace(dto.Address))
+            if (string.IsNullOrWhiteSpace(model.Address))
                 throw new BusinessValidationException("Address is required.");
         }
     }

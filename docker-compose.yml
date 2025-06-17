@@ -27,6 +27,18 @@ services:
     networks:
       - app-network
 
+  travel-agency-frontend:
+    build:
+      context: ./Travel_agency_frontend
+      dockerfile: Dockerfile
+    container_name: travel-agency-frontend
+    ports:
+      - "3000:80"
+    networks:
+      - app-network
+    depends_on:
+      - travel-agency-pl
+
 networks:
   app-network:
     driver: bridge

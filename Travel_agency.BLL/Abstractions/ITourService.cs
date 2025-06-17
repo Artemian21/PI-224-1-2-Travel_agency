@@ -1,14 +1,14 @@
-﻿using Travel_agency.Core.Models.Tours;
+﻿using Travel_agency.Core.BusinessModels.Tours;
 
 namespace Travel_agency.BLL.Abstractions
 {
     public interface ITourService
     {
-        Task<TourDto> AddTourAsync(TourDto tourDto);
+        Task<TourModel> AddTourAsync(TourModel tourModel);
         Task<bool> DeleteTourAsync(Guid tourId);
-        Task<IEnumerable<TourDto>> GetAllToursAsync();
-        Task<PagedResult<TourDto>> GetPagedToursAsync(int pageNumber, int pageSize);
-        Task<TourWithBookingsDto> GetTourByIdAsync(Guid tourId);
-        Task<TourDto> UpdateTourAsync(TourDto tourDto);
+        Task<IEnumerable<TourModel>> GetAllToursAsync();
+        Task<PagedResult<TourModel>> GetPagedToursAsync(int pageNumber, int pageSize);
+        Task<TourWithBookingsModel> GetTourByIdAsync(Guid tourId);
+        Task<TourModel> UpdateTourAsync(TourModel tourModel);
     }
 }

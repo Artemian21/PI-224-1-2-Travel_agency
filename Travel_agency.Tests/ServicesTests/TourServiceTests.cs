@@ -5,7 +5,7 @@ using NSubstitute;
 using Travel_agency.BLL.Services;
 using Travel_agency.Core.Enums;
 using Travel_agency.Core.Exceptions;
-using Travel_agency.Core.Models.Tours;
+using Travel_agency.Core.BusinessModels.Tours;
 using Travel_agency.DataAccess.Abstraction;
 using Travel_agency.DataAccess.Entities;
 
@@ -33,47 +33,47 @@ namespace Travel_agency.Tests.ServicesTests;
         }
 
         [Fact]
-        public async Task GetAllToursAsync_ReturnsMappedDtos()
+        public async Task GetAllToursAsync_ReturnsMappedModels()
         {
             var entities = _fixture.CreateMany<TourEntity>();
-            var dtos = _fixture.CreateMany<TourDto>();
+            var models = _fixture.CreateMany<TourModel>();
             _unitOfWork.Tours.GetAllToursAsync().Returns(entities);
-            _mapper.Map<IEnumerable<TourDto>>(entities).Returns(dtos);
+            _mapper.Map<IEnumerable<TourModel>>(entities).Returns(models);
 
             var result = await _service.GetAllToursAsync();
 
-            Assert.Equal(dtos, result);
+            Assert.Equal(models, result);
         }
 
         [Fact]
         public async Task GetPagedToursAsync_ReturnsPagedResult()
         {
             var entities = _fixture.CreateMany<TourEntity>();
-            var dtos = _fixture.CreateMany<TourDto>();
+            var models = _fixture.CreateMany<TourModel>();
             _unitOfWork.Tours.GetTotalToursCountAsync().Returns(100);
             _unitOfWork.Tours.GetToursPagedAsync(1, 10).Returns(entities);
-            _mapper.Map<IEnumerable<TourDto>>(entities).Returns(dtos);
+            _mapper.Map<IEnumerable<TourModel>>(entities).Returns(models);
 
             var result = await _service.GetPagedToursAsync(1, 10);
 
             Assert.Equal(1, result.PageNumber);
             Assert.Equal(10, result.PageSize);
             Assert.Equal(100, result.TotalCount);
-            Assert.Equal(dtos, result.Items);
+            Assert.Equal(models, result.Items);
         }
 
         [Fact]
-        public async Task GetTourByIdAsync_ValidId_ReturnsDto()
+        public async Task GetTourByIdAsync_ValidId_ReturnsModel()
         {
             var id = Guid.NewGuid();
             var entity = _fixture.Create<TourEntity>();
-            var dto = _fixture.Create<TourWithBookingsDto>();
+            var model = _fixture.Create<TourWithBookingsModel>();
             _unitOfWork.Tours.GetTourByIdAsync(id).Returns(entity);
-            _mapper.Map<TourWithBookingsDto>(entity).Returns(dto);
+            _mapper.Map<TourWithBookingsModel>(entity).Returns(model);
 
             var result = await _service.GetTourByIdAsync(id);
 
-            Assert.Equal(dto, result);
+            Assert.Equal(model, result);
         }
 
         [Fact]
@@ -85,9 +85,9 @@ namespace Travel_agency.Tests.ServicesTests;
         }
 
         [Fact]
-        public async Task AddTourAsync_ValidTour_ReturnsDto()
+        public async Task AddTourAsync_ValidTour_ReturnsModel()
         {
-            var dto = _fixture.Build<TourDto>()
+            var model = _fixture.Build<TourModel>()
                 .With(x => x.Name, "Tour")
                 .With(x => x.Country, "Country")
                 .With(x => x.Region, "Region")
@@ -99,15 +99,15 @@ namespace Travel_agency.Tests.ServicesTests;
 
             var entity = _fixture.Create<TourEntity>();
             var savedEntity = _fixture.Create<TourEntity>();
-            var resultDto = _fixture.Create<TourDto>();
+            var resultModel = _fixture.Create<TourModel>();
 
-            _mapper.Map<TourEntity>(dto).Returns(entity);
+            _mapper.Map<TourEntity>(model).Returns(entity);
             _unitOfWork.Tours.AddTourAsync(entity).Returns(savedEntity);
-            _mapper.Map<TourDto>(savedEntity).Returns(resultDto);
+            _mapper.Map<TourModel>(savedEntity).Returns(resultModel);
 
-            var result = await _service.AddTourAsync(dto);
+            var result = await _service.AddTourAsync(model);
 
-            Assert.Equal(resultDto, result);
+            Assert.Equal(resultModel, result);
         }
 
         [Theory]
@@ -117,9 +117,9 @@ namespace Travel_agency.Tests.ServicesTests;
         [InlineData("Tour", "Country", "Region", -10, 1, 2, TypeTour.Cruise)]
         [InlineData("Tour", "Country", "Region", 100, -1, 2, TypeTour.Cruise)]
         [InlineData("Tour", "Country", "Region", 100, 2, 1, TypeTour.Cruise)]
-        public async Task AddTourAsync_InvalidDto_ThrowsValidation(string name, string country, string region, decimal price, int startOffset, int endOffset, TypeTour type)
+        public async Task AddTourAsync_InvalidModel_ThrowsValidation(string name, string country, string region, decimal price, int startOffset, int endOffset, TypeTour type)
         {
-            var dto = new TourDto
+            var model = new TourModel
             {
                 Name = name,
                 Country = country,
@@ -130,13 +130,13 @@ namespace Travel_agency.Tests.ServicesTests;
                 Type = type
             };
 
-            await Assert.ThrowsAnyAsync<BusinessValidationException>(() => _service.AddTourAsync(dto));
+            await Assert.ThrowsAnyAsync<BusinessValidationException>(() => _service.AddTourAsync(model));
         }
 
         [Fact]
-        public async Task UpdateTourAsync_ValidTour_ReturnsDto()
+        public async Task UpdateTourAsync_ValidTour_ReturnsModel()
         {
-            var dto = _fixture.Build<TourDto>()
+            var model = _fixture.Build<TourModel>()
                 .With(x => x.Name, "Tour")
                 .With(x => x.Country, "Country")
                 .With(x => x.Region, "Region")
@@ -148,21 +148,21 @@ namespace Travel_agency.Tests.ServicesTests;
 
             var entity = _fixture.Create<TourEntity>();
             var updatedEntity = _fixture.Create<TourEntity>();
-            var resultDto = _fixture.Create<TourDto>();
+            var resultModel = _fixture.Create<TourModel>();
 
-            _mapper.Map<TourEntity>(dto).Returns(entity);
+            _mapper.Map<TourEntity>(model).Returns(entity);
             _unitOfWork.Tours.UpdateTourAsync(entity).Returns(updatedEntity);
-            _mapper.Map<TourDto>(updatedEntity).Returns(resultDto);
+            _mapper.Map<TourModel>(updatedEntity).Returns(resultModel);
 
-            var result = await _service.UpdateTourAsync(dto);
+            var result = await _service.UpdateTourAsync(model);
 
-            Assert.Equal(resultDto, result);
+            Assert.Equal(resultModel, result);
         }
 
         [Fact]
         public async Task UpdateTourAsync_NotFound_ThrowsException()
         {
-            var dto = _fixture.Build<TourDto>()
+            var model = _fixture.Build<TourModel>()
                 .With(x => x.Name, "Tour")
                 .With(x => x.Country, "Country")
                 .With(x => x.Region, "Region")
@@ -173,10 +173,10 @@ namespace Travel_agency.Tests.ServicesTests;
                 .Create();
 
             var entity = _fixture.Create<TourEntity>();
-            _mapper.Map<TourEntity>(dto).Returns(entity);
+            _mapper.Map<TourEntity>(model).Returns(entity);
             _unitOfWork.Tours.UpdateTourAsync(entity).Returns((TourEntity)null);
 
-            await Assert.ThrowsAsync<NotFoundException>(() => _service.UpdateTourAsync(dto));
+            await Assert.ThrowsAsync<NotFoundException>(() => _service.UpdateTourAsync(model));
         }
 
         [Fact]

@@ -1,9 +1,9 @@
-﻿using Travel_agency.Core.Models.Tours;
+﻿using Travel_agency.Core.BusinessModels.Tours;
 
 namespace Travel_agency.BLL.Abstractions;
 
 public interface ITourQueryService
 {
-    Task<IEnumerable<TourDto>> GetFilteredToursAsync(TourFilterDto filter);
-    Task<IEnumerable<TourDto>> SearchToursAsync(string searchQuery);
+    Task<IEnumerable<TourModel>> GetFilteredToursAsync(TourFilterModel filter);
+    Task<IEnumerable<TourModel>> SearchToursAsync(string searchQuery);
 }
